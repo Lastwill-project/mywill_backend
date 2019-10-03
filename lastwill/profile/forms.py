@@ -28,10 +28,10 @@ class SubSitePasswordResetForm(PasswordResetForm):
             subsite_domain = request.META['HTTP_HOST']
 
             token_generator_link = '{protocol}://{domain}/reset/{uid}/{token}/'.format(
-                    protocol=protocol,
-                    domain=subsite_domain,
-                    uid=u_id,
-                    token=u_token
+                protocol=protocol,
+                domain=subsite_domain,
+                uid=u_id,
+                token=u_token
             )
 
             if subsite_domain == MY_WISH_URL:
@@ -39,27 +39,27 @@ class SubSitePasswordResetForm(PasswordResetForm):
                 subsite_name = 'MyWish Platform'
 
                 send_mail(
-                        password_reset_subject.format(subsite_name=subsite_name),
-                        password_reset_text.format(
-                                subsite_name=subsite_name,
-                                user_display=user,
-                                password_reset_url=token_generator_link
-                        ),
-                        from_email,
-                        [user.username]
+                    password_reset_subject.format(subsite_name=subsite_name),
+                    password_reset_text.format(
+                        subsite_name=subsite_name,
+                        user_display=user,
+                        password_reset_url=token_generator_link
+                    ),
+                    from_email,
+                    [user.username]
                 )
 
             if subsite_domain == SWAPS_URL:
-                #from_email = EMAIL_HOST_USER_SWAPS
+                # from_email = EMAIL_HOST_USER_SWAPS
                 subsite_name = "SWAPS.NETWORK"
 
                 sendEMail(
-                        password_reset_subject.format(subsite_name=subsite_name),
-                        password_reset_text.format(
-                                subsite_name=subsite_name,
-                                user_display=user,
-                                password_reset_url=token_generator_link
-                        ),
-                        # from_email,
-                        user.username
+                    password_reset_subject.format(subsite_name=subsite_name),
+                    password_reset_text.format(
+                        subsite_name=subsite_name,
+                        user_display=user,
+                        password_reset_url=token_generator_link
+                    ),
+                    # from_email,
+                    user.username
                 )

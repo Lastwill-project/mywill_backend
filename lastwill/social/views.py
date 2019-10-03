@@ -56,18 +56,19 @@ def fb_complete_login(request, app, token):
 
 
 class FacebookOAuth2Adapter(OAuth2Adapter):
+    print('i am here', flush=True)
     provider_id = FacebookProvider.id
-    # print('provider id', provider_id, flush=True)
+    print('provider id', provider_id, flush=True)
     provider_default_auth_url = (
         'https://www.facebook.com/{}/dialog/oauth'.format(
             GRAPH_API_VERSION))
 
     settings = app_settings.PROVIDERS.get(provider_id, {})
-    # print('settings', settings, flush=True)
+    print('settings', settings, flush=True)
     authorize_url = settings.get('AUTHORIZE_URL', provider_default_auth_url)
-    # print('authorize_url', authorize_url, flush=True)
+    print('authorize_url', authorize_url, flush=True)
     access_token_url = GRAPH_API_URL + '/oauth/access_token'
-    # print('access_token_url', access_token_url, flush=True)
+    print('access_token_url', access_token_url, flush=True)
     expires_in_key = 'expires_in'
 
     def complete_login(self, request, app, access_token, **kwargs):
