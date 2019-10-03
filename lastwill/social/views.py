@@ -33,6 +33,7 @@ def compute_appsecret_proof(app, token):
 
 
 def fb_complete_login(request, app, token):
+    print('i am here 2')
     provider = providers.registry.by_id(FacebookProvider.id, request)
     resp = requests.get(
         GRAPH_API_URL + '/me',
