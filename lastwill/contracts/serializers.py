@@ -154,6 +154,7 @@ class ContractSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        print(1, flush=True)
         validated_data['user'] = self.context['request'].user
         if validated_data.get('state') not in ('CREATED', 'WAITING_FOR_PAYMENT'):
             validated_data['state'] = 'CREATED'
@@ -162,15 +163,18 @@ class ContractSerializer(serializers.ModelSerializer):
         details_serializer = self.get_details_serializer(
             contract_type
         )(context=self.context)
+        print(2, flush=True)
         contract_details = validated_data.pop('contract_details')
         details_serializer.validate(contract_details)
         validated_data['cost'] = Contract.get_details_model(
             contract_type
         ).calc_cost(contract_details, validated_data['network'])
         transaction.set_autocommit(False)
+        print(3, flush=True)
         try:
             contract = super().create(validated_data)
             details_serializer.create(contract, contract_details)
+            print(4, flush=True)
         except:
             transaction.rollback()
             raise
