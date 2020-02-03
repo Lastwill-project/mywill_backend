@@ -342,14 +342,14 @@ class Contract(models.Model):
         swap2 = apps.get_model('contracts', 'ContractDetailsSWAPS2')
         token_protector = apps.get_model('contracts', 'ContractDetailsTokenProtector')
 
-        duc_lastwill = lastwill
-        duc_lostkey = lostkey
-        duc_deffered = deffered
-        duc_ico = ico
-        duc_token = token
-        duc_airdrop = airdrop
-        duc_investment = investment
-        duc_lostkey_tokens = eth_lostkey_tokens
+        duc_lastwill = apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill')
+        duc_lostkey = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey')
+        duc_deffered = apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment')
+        duc_ico = apps.get_model('contracts', 'ContractDetailsDUCATUSXICO')
+        duc_token = apps.get_model('contracts', 'ContractDetailsDUCATUSXToken')
+        duc_airdrop = apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop')
+        duc_investment = apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool')
+        duc_lostkey_tokens = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
 
 
         contract_details_types[0] = {'name': 'Will contract', 'model': lastwill}
