@@ -1,4 +1,3 @@
-from lastwill.contracts.submodels.common import *
 from .lastwill import ContractDetailsLastwill
 from .lostkey import ContractDetailsLostKey
 from .deffered import ContractDetailsDelayedPayment
