@@ -1,3 +1,4 @@
+from .common import CommonDetails
 from .lastwill import ContractDetailsLastwill
 from .lostkey import ContractDetailsLostKey
 from .deffered import ContractDetailsDelayedPayment
@@ -8,26 +9,26 @@ from .investment_pool import ContractDetailsInvestmentPool
 from .lostkey import ContractDetailsLostKeyTokens
 
 
-class ContractDetailsDUCATUSXLastwill(ContractDetailsLastwill):
+class ContractDetailsDUCATUSXLastwill(CommonDetails, ContractDetailsLastwill):
     pass
 
-class ContractDetailsDUCATUSXLostKey(ContractDetailsLostKey):
+class ContractDetailsDUCATUSXLostKey(CommonDetails, ContractDetailsLostKey):
     pass
 
-class ContractDetailsDUCATUSXDelayedPayment(ContractDetailsDelayedPayment):
+class ContractDetailsDUCATUSXDelayedPayment(CommonDetails, ContractDetailsDelayedPayment):
     pass
 
-class ContractDetailsDUCATUSXICO(ContractDetailsICO):
+class ContractDetailsDUCATUSXICO(CommonDetails, ContractDetailsICO):
     pass
 
-class ContractDetailsDUCATUSXToken(ContractDetailsToken):
+class ContractDetailsDUCATUSXToken(CommonDetails, ContractDetailsToken):
     pass
 
-class ContractDetailsDUCATUSXAirdrop(ContractDetailsAirdrop):
+class ContractDetailsDUCATUSXAirdrop(CommonDetails, ContractDetailsAirdrop):
     pass
 
-class ContractDetailsDUCATUSXInvestmentPool(ContractDetailsInvestmentPool):
+class ContractDetailsDUCATUSXInvestmentPool(CommonDetails, ContractDetailsInvestmentPool):
     pass
 
-class ContractDetailsDUCATUSXLostKeyTokens(ContractDetailsLostKeyTokens):
+class ContractDetailsDUCATUSXLostKeyTokens(CommonDetails, ContractDetailsLostKeyTokens):
     pass
