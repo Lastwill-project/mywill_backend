@@ -342,6 +342,16 @@ class Contract(models.Model):
         swap2 = apps.get_model('contracts', 'ContractDetailsSWAPS2')
         token_protector = apps.get_model('contracts', 'ContractDetailsTokenProtector')
 
+        duc_lastwill = lastwill
+        duc_lostkey = lostkey
+        duc_deffered = deffered
+        duc_ico = ico
+        duc_token = token
+        duc_airdrop = airdrop
+        duc_investment = investment
+        duc_lostkey_tokens = eth_lostkey_tokens
+
+
         contract_details_types[0] = {'name': 'Will contract', 'model': lastwill}
         contract_details_types[1] = {'name': 'Wallet contract (lost key)',
                                      'model': lostkey}
@@ -367,6 +377,16 @@ class Contract(models.Model):
         contract_details_types[22] = {'name': 'WAVES Contract STO', 'model': waves}
         contract_details_types[21] = {'name': 'SWAPS Contract', 'model': swap2}
         contract_details_types[23] = {'name': 'Token protector contract', 'model': token_protector}
+        contract_details_types[24] = {'name': 'DUCATUSX Will contract', 'model': duc_lastwill}
+        contract_details_types[25] = {'name': 'DUCATUSX Wallet contract (lost key)',
+                                     'model': duc_lostkey}
+        contract_details_types[26] = {'name': 'DUCATUSX Deferred payment contract',
+                                     'model': duc_deffered}
+        contract_details_types[27] = {'name': 'DUCATUSX MyWish ICO', 'model': duc_ico}
+        contract_details_types[28] = {'name': 'DUCATUSX Token contract', 'model': duc_token}
+        contract_details_types[29] = {'name': 'DUCATUSX Airdrop', 'model': duc_airdrop}
+        contract_details_types[30] = {'name': 'DUCATUSX InvestmentPool', 'model': duc_investment}
+        contract_details_types[31] = {'name': 'DUCATUSX LostKey with tokens', 'model': duc_lostkey_tokens}
 
         return contract_details_types
 
