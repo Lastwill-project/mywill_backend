@@ -111,7 +111,7 @@ class ContractDetailsDUCATUSXToken(CommonDetails):
         )
         self.save()
 
-    @blocking
+    # @blocking
     @postponable
     def deploy(self, eth_contract_attr_name='eth_contract_token'):
         return super().deploy(eth_contract_attr_name)
