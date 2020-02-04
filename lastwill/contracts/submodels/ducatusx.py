@@ -258,10 +258,14 @@ class ContractDetailsDUCATUSXToken(CommonDetails):
         pass
 
 
-# @contract_details('DUCATUSX Airdrop')
-# class ContractDetailsDUCATUSXAirdrop(ContractDetailsAirdrop):
-#     pass
-#
+class AbstractContractDetailsAirdrop(ContractDetailsAirdrop):
+    class Meta:
+        abstract = True
+
+@contract_details('DUCATUSX Airdrop')
+class ContractDetailsDUCATUSXAirdrop(AbstractContractDetailsAirdrop):
+    pass
+
 # @contract_details('DUCATUSX Investment Pool')
 # class ContractDetailsDUCATUSXInvestmentPool(ContractDetailsInvestmentPool):
 #     pass
