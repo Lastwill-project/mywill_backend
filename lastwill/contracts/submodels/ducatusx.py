@@ -98,7 +98,7 @@ class ContractDetailsDUCATUSXDelayedPayment(CommonDetails):
     def get_gaslimit(self):
         return CONTRACT_GAS_LIMIT['DEFFERED']
 
-    @blocking
+    # @blocking
     @postponable
     def deploy(self):
         return super().deploy()
