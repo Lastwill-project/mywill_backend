@@ -24,7 +24,20 @@ class ContractDetailsDUCATUSXDelayedPayment(AbstractContractDetailsDelayedPaymen
 
 @contract_details('DUCATUSX MyWish ICO')
 class ContractDetailsDUCATUSXICO(AbstractContractDetailsICO):
-    pass
+    eth_contract_token = models.ForeignKey(
+        EthContract,
+        null=True,
+        default=None,
+        related_name='ducatusx_ico_details_token',
+        on_delete=models.SET_NULL
+    )
+    eth_contract_crowdsale = models.ForeignKey(
+        EthContract,
+        null=True,
+        default=None,
+        related_name='ducatusx_ico_details_crowdsale',
+        on_delete=models.SET_NULL
+    )
 
 
 @contract_details('DUCATUSX Token contract')
@@ -49,4 +62,10 @@ class ContractDetailsDUCATUSXInvestmentPool(AbstractContractDetailsInvestmentPoo
 
 @contract_details('DUCATUSX Wallet contract (lost key)')
 class ContractDetailsDUCATUSXLostKeyTokens(AbstractContractDetailsLostKeyTokens):
-    pass
+    eth_contract = models.ForeignKey(
+        EthContract,
+        null=True,
+        default=None,
+        related_name='ducatusx_lostkey_details',
+        on_delete=models.SET_NULL
+    )
