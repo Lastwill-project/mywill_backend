@@ -45,7 +45,7 @@ class ContractDetailsDUCATUSXToken(CommonDetails):
         EthContract,
         null=True,
         default=None,
-        related_name='token_details_token',
+        related_name='ducatusx_token_details_token',
         on_delete=models.SET_NULL
     )
     future_minting = models.BooleanField(default=False)
