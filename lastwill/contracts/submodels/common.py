@@ -310,9 +310,24 @@ class Contract(models.Model):
         return super().save(*args, **kwargs)
 
     def get_details(self):
-        return getattr(self, self.get_details_model(
-            self.contract_type
-        ).__name__.lower()+'_set').first()
+        try:
+            return getattr(self, self.get_details_model(
+                self.contract_type
+            ).__name__.lower()+'_set').first()
+        except:
+            ducatusx_models = [
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXICO'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXToken'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool'),
+                apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
+            ]
+            for model in ducatusx_models:
+                if model.objects.filter(contract=self).first:
+                    return model
 
 
     @classmethod
