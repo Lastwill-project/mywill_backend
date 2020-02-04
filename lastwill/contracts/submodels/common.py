@@ -310,24 +310,10 @@ class Contract(models.Model):
         return super().save(*args, **kwargs)
 
     def get_details(self):
-        # try:
-            return getattr(self, self.get_details_model(
-                self.contract_type
-            ).__name__.lower()+'_set').first()
-        # except:
-        #     ducatusx_models = [
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXICO'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXToken'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool'),
-        #         apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
-        #     ]
-        #     for model in ducatusx_models:
-        #         if model.objects.filter(contract=self).first:
-        #             return model
+        return getattr(self, self.get_details_model(
+            self.contract_type
+        ).__name__.lower()+'_set').first()
+
 
 
     @classmethod
@@ -358,14 +344,14 @@ class Contract(models.Model):
         swap2 = apps.get_model('contracts', 'ContractDetailsSWAPS2')
         token_protector = apps.get_model('contracts', 'ContractDetailsTokenProtector')
 
-        # duc_lastwill = apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill')
-        # duc_lostkey = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey')
-        # duc_deffered = apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment')
-        # duc_ico = apps.get_model('contracts', 'ContractDetailsDUCATUSXICO')
-        # duc_token = apps.get_model('contracts', 'ContractDetailsDUCATUSXToken')
-        # duc_airdrop = apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop')
-        # duc_investment = apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool')
-        # duc_lostkey_tokens = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
+        duc_lastwill = apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill')
+        duc_lostkey = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey')
+        duc_deffered = apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment')
+        duc_ico = apps.get_model('contracts', 'ContractDetailsDUCATUSXICO')
+        duc_token = apps.get_model('contracts', 'ContractDetailsDUCATUSXToken')
+        duc_airdrop = apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop')
+        duc_investment = apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool')
+        duc_lostkey_tokens = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
 
 
         contract_details_types[0] = {'name': 'Will contract', 'model': lastwill}
