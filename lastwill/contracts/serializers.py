@@ -31,7 +31,8 @@ from lastwill.contracts.models import (
     ContractDetailsWavesSTO, ContractDetailsSWAPS, InvestAddresses, ContractDetailsSWAPS2,
     ContractDetailsTokenProtector, ApprovedToken,
     # ContractDetailsDUCATUSXLastwill,
-    # ContractDetailsDUCATUSXLostKey, ContractDetailsDUCATUSXDelayedPayment,
+    # ContractDetailsDUCATUSXLostKey,
+    ContractDetailsDUCATUSXDelayedPayment,
     # ContractDetailsDUCATUSXICO,
     ContractDetailsDUCATUSXToken,
     # ContractDetailsDUCATUSXAirdrop, ContractDetailsDUCATUSXInvestmentPool,
@@ -321,7 +322,7 @@ class ContractSerializer(serializers.ModelSerializer):
             23: TokenProtectorSerializer,
             # 24: ContractDetailsDUCATUSXLastwillSerializer,
             # 25: ContractDetailsDUCATUSXLostKeySerializer,
-            # 26: ContractDetailsDUCATUSXDelayedPaymentSerializer,
+            26: ContractDetailsDUCATUSXDelayedPaymentSerializer,
             # 27: ContractDetailsDUCATUSXICOSerializer,
             28: ContractDetailsDUCATUSXTokenSerializer,
             # 29: ContractDetailsDUCATUSXAirdropSerializer,
@@ -1754,9 +1755,9 @@ class ContractDetailsSTOSerializer(serializers.ModelSerializer):
 #     class Meta(ContractDetailsLostKeySerializer.Meta):
 #         model = ContractDetailsDUCATUSXLostKey
 #
-# class ContractDetailsDUCATUSXDelayedPaymentSerializer(ContractDetailsDelayedPaymentSerializer):
-#     class Meta(ContractDetailsDelayedPaymentSerializer.Meta):
-#         model = ContractDetailsDUCATUSXDelayedPayment
+class ContractDetailsDUCATUSXDelayedPaymentSerializer(ContractDetailsDelayedPaymentSerializer):
+    class Meta(ContractDetailsDelayedPaymentSerializer.Meta):
+        model = ContractDetailsDUCATUSXDelayedPayment
 #
 # class ContractDetailsDUCATUSXICOSerializer(ContractDetailsICOSerializer):
 #     class Meta(ContractDetailsICOSerializer.Meta):
