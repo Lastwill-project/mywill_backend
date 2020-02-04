@@ -35,7 +35,7 @@ class ContractDetailsDUCATUSXICO(ContractDetailsICO):
     pass
 
 @contract_details('DUCATUSX Token contract')
-class ContractDetailsDUCATUSXToken(ContractDetailsToken):
+class ContractDetailsDUCATUSXToken(CommonDetails):
     token_name = models.CharField(max_length=512)
     token_short_name = models.CharField(max_length=64)
     admin_address = models.CharField(max_length=50)
