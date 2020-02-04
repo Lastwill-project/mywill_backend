@@ -360,10 +360,10 @@ class Contract(models.Model):
 
         # duc_lastwill = apps.get_model('contracts', 'ContractDetailsDUCATUSXLastwill')
         # duc_lostkey = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKey')
-        duc_deffered = apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment')
+        # duc_deffered = apps.get_model('contracts', 'ContractDetailsDUCATUSXDelayedPayment')
         # duc_ico = apps.get_model('contracts', 'ContractDetailsDUCATUSXICO')
-        duc_token = apps.get_model('contracts', 'ContractDetailsDUCATUSXToken')
-        duc_airdrop = apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop')
+        # duc_token = apps.get_model('contracts', 'ContractDetailsDUCATUSXToken')
+        # duc_airdrop = apps.get_model('contracts', 'ContractDetailsDUCATUSXAirdrop')
         # duc_investment = apps.get_model('contracts', 'ContractDetailsDUCATUSXInvestmentPool')
         # duc_lostkey_tokens = apps.get_model('contracts', 'ContractDetailsDUCATUSXLostKeyTokens')
 
@@ -396,11 +396,11 @@ class Contract(models.Model):
         # contract_details_types[24] = {'name': 'DUCATUSX Will contract', 'model': duc_lastwill}
         # contract_details_types[25] = {'name': 'DUCATUSX Wallet contract (lost key)',
         #                              'model': duc_lostkey}
-        contract_details_types[26] = {'name': 'DUCATUSX Deferred payment contract',
-                                     'model': duc_deffered}
+        # contract_details_types[26] = {'name': 'DUCATUSX Deferred payment contract',
+        #                              'model': duc_deffered}
         # contract_details_types[27] = {'name': 'DUCATUSX MyWish ICO', 'model': duc_ico}
-        contract_details_types[28] = {'name': 'DUCATUSX Token contract', 'model': duc_token}
-        contract_details_types[29] = {'name': 'DUCATUSX Airdrop', 'model': duc_airdrop}
+        # contract_details_types[28] = {'name': 'DUCATUSX Token contract', 'model': duc_token}
+        # contract_details_types[29] = {'name': 'DUCATUSX Airdrop', 'model': duc_airdrop}
         # contract_details_types[30] = {'name': 'DUCATUSX InvestmentPool', 'model': duc_investment}
         # contract_details_types[31] = {'name': 'DUCATUSX LostKey with tokens', 'model': duc_lostkey_tokens}
 

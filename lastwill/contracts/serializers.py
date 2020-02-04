@@ -32,10 +32,10 @@ from lastwill.contracts.models import (
     ContractDetailsTokenProtector, ApprovedToken,
     # ContractDetailsDUCATUSXLastwill,
     # ContractDetailsDUCATUSXLostKey,
-    ContractDetailsDUCATUSXDelayedPayment,
+    # ContractDetailsDUCATUSXDelayedPayment,
     # ContractDetailsDUCATUSXICO,
-    ContractDetailsDUCATUSXToken,
-    ContractDetailsDUCATUSXAirdrop,
+    # ContractDetailsDUCATUSXToken,
+    # ContractDetailsDUCATUSXAirdrop,
     # ContractDetailsDUCATUSXInvestmentPool,
     # ContractDetailsDUCATUSXLostKeyTokens
 )
@@ -323,10 +323,10 @@ class ContractSerializer(serializers.ModelSerializer):
             23: TokenProtectorSerializer,
             # 24: ContractDetailsDUCATUSXLastwillSerializer,
             # 25: ContractDetailsDUCATUSXLostKeySerializer,
-            26: ContractDetailsDUCATUSXDelayedPaymentSerializer,
+            # 26: ContractDetailsDUCATUSXDelayedPaymentSerializer,
             # 27: ContractDetailsDUCATUSXICOSerializer,
-            28: ContractDetailsDUCATUSXTokenSerializer,
-            29: ContractDetailsDUCATUSXAirdropSerializer,
+            # 28: ContractDetailsDUCATUSXTokenSerializer,
+            # 29: ContractDetailsDUCATUSXAirdropSerializer,
             # 30: ContractDetailsDUCATUSXInvestmentPoolSerializer,
             # 31: ContractDetailsDUCATUSXLostKeyTokensSerializer
         }[contract_type]
@@ -1755,22 +1755,22 @@ class ContractDetailsSTOSerializer(serializers.ModelSerializer):
 # class ContractDetailsDUCATUSXLostKeySerializer(ContractDetailsLostKeySerializer):
 #     class Meta(ContractDetailsLostKeySerializer.Meta):
 #         model = ContractDetailsDUCATUSXLostKey
-#
-class ContractDetailsDUCATUSXDelayedPaymentSerializer(ContractDetailsDelayedPaymentSerializer):
-    class Meta(ContractDetailsDelayedPaymentSerializer.Meta):
-        model = ContractDetailsDUCATUSXDelayedPayment
+# #
+# class ContractDetailsDUCATUSXDelayedPaymentSerializer(ContractDetailsDelayedPaymentSerializer):
+#     class Meta(ContractDetailsDelayedPaymentSerializer.Meta):
+#         model = ContractDetailsDUCATUSXDelayedPayment
 #
 # class ContractDetailsDUCATUSXICOSerializer(ContractDetailsICOSerializer):
 #     class Meta(ContractDetailsICOSerializer.Meta):
 #         model = ContractDetailsDUCATUSXICO
 #
-class ContractDetailsDUCATUSXTokenSerializer(ContractDetailsTokenSerializer):
-    class Meta(ContractDetailsTokenSerializer.Meta):
-        model = ContractDetailsDUCATUSXToken
+# class ContractDetailsDUCATUSXTokenSerializer(ContractDetailsTokenSerializer):
+#     class Meta(ContractDetailsTokenSerializer.Meta):
+#         model = ContractDetailsDUCATUSXToken
 #
-class ContractDetailsDUCATUSXAirdropSerializer(ContractDetailsAirdropSerializer):
-    class Meta(ContractDetailsAirdropSerializer.Meta):
-        model = ContractDetailsDUCATUSXAirdrop
+# class ContractDetailsDUCATUSXAirdropSerializer(ContractDetailsAirdropSerializer):
+#     class Meta(ContractDetailsAirdropSerializer.Meta):
+#         model = ContractDetailsDUCATUSXAirdrop
 #
 # class ContractDetailsDUCATUSXInvestmentPoolSerializer(ContractDetailsInvestmentPoolSerializer):
 #     class Meta(ContractDetailsInvestmentPoolSerializer.Meta):

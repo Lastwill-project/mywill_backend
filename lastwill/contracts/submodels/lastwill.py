@@ -14,8 +14,11 @@ from lastwill.settings import LASTWILL_ALIVE_TIMEOUT
 from lastwill.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT
 
 
-@contract_details('Will contract')
-class ContractDetailsLastwill(CommonDetails):
+
+class AbstractContractDetailsLastwill(CommonDetails):
+    class Meta:
+        abstract = True
+
     sol_path = 'lastwill/last-will/'
     source_filename = 'contracts/LastWillNotify.sol'
     result_filename = 'build/contracts/LastWillNotify.json'
@@ -164,8 +167,8 @@ class ContractDetailsLastwill(CommonDetails):
                 send_mail(
                     heir_subject,
                     heir_message.format(
-                            user_address=heir.address,
-                            link_tx=link.format(tx=message['transactionHash'])
+                        user_address=heir.address,
+                        link_tx=link.format(tx=message['transactionHash'])
                     ),
                     DEFAULT_FROM_EMAIL,
                     [heir.email]
@@ -218,8 +221,8 @@ class ContractDetailsLastwill(CommonDetails):
             address, nonce, gas_limit, self.contract.network.name,
             dest=self.eth_contract.address,
             contract_data=binascii.hexlify(
-                    tr.encode_function_call('imAvailable', [])
-                ).decode(),
+                tr.encode_function_call('imAvailable', [])
+            ).decode(),
         )
         self.eth_contract.tx_hash = eth_int.eth_sendRawTransaction(
             '0x' + signed_data
@@ -235,11 +238,11 @@ class ContractDetailsLastwill(CommonDetails):
         nonce = int(eth_int.eth_getTransactionCount(address, "pending"), 16)
         gas_limit = CONTRACT_GAS_LIMIT['LASTWILL_COMMON']
         signed_data = sign_transaction(
-            address, nonce,  gas_limit, self.contract.network.name,
+            address, nonce, gas_limit, self.contract.network.name,
             dest=self.eth_contract.address,
             contract_data=binascii.hexlify(
-                    tr.encode_function_call('kill', [])
-                ).decode(),
+                tr.encode_function_call('kill', [])
+            ).decode(),
         )
         self.eth_contract.tx_hash = eth_int.eth_sendRawTransaction(
             '0x' + signed_data
@@ -253,3 +256,8 @@ class ContractDetailsLastwill(CommonDetails):
             id=self.id
         ).update(btc_duty=F('btc_duty') - message['value'])
         take_off_blocking(self.contract.network.name)
+
+
+@contract_details('Will contract')
+class ContractDetailsLastwill(AbstractContractDetailsLastwill):
+    pass

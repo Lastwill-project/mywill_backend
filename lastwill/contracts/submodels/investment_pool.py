@@ -19,8 +19,10 @@ class InvestAddress(models.Model):
     )
 
 
-@contract_details('Investment Pool')
-class ContractDetailsInvestmentPool(CommonDetails):
+
+class AbstractContractDetailsInvestmentPool(CommonDetails):
+    class Meta:
+        abstract = True
 
     contract = models.ForeignKey(Contract, null=True)
     admin_address = models.CharField(max_length=50)
@@ -58,10 +60,10 @@ class ContractDetailsInvestmentPool(CommonDetails):
 
     def get_arguments(self, *args, **kwargs):
         return [
-                self.admin_address,
-                self.investment_address if self.investment_address else '0x'+'0'*40,
-                self.token_address if self.token_address else '0x'+'0'*40,
-                NETWORKS[self.contract.network.name]['address'] if self.platform_as_admin else '0x'+'0'*40,
+            self.admin_address,
+            self.investment_address if self.investment_address else '0x' + '0' * 40,
+            self.token_address if self.token_address else '0x' + '0' * 40,
+            NETWORKS[self.contract.network.name]['address'] if self.platform_as_admin else '0x' + '0' * 40,
         ]
 
     def compile(self, _=''):
@@ -81,8 +83,10 @@ class ContractDetailsInvestmentPool(CommonDetails):
         preproc_params["constants"]["D_END_TIME"] = self.stop_date
         preproc_params["constants"]["D_WHITELIST"] = "true" if self.whitelist else "false"
         preproc_params["constants"]["D_CAN_CHANGE_TIMES"] = "true" if self.allow_change_dates else "false"
-        preproc_params["constants"]["D_CAN_FINALIZE_AFTER_HARD_CAP_ONLY_OWNER"] = "false" if self.send_tokens_hard_cap else "true"
-        preproc_params["constants"]["D_CAN_FINALIZE_AFTER_SOFT_CAP_ONLY_OWNER"] = "false" if self.send_tokens_soft_cap else "true"
+        preproc_params["constants"][
+            "D_CAN_FINALIZE_AFTER_HARD_CAP_ONLY_OWNER"] = "false" if self.send_tokens_hard_cap else "true"
+        preproc_params["constants"][
+            "D_CAN_FINALIZE_AFTER_SOFT_CAP_ONLY_OWNER"] = "false" if self.send_tokens_soft_cap else "true"
         preproc_params["constants"]["D_REWARD_PERMILLE"] = int(self.admin_percent * 10)
 
         if self.min_wei:
@@ -155,7 +159,7 @@ class ContractDetailsInvestmentPool(CommonDetails):
     def finalized(self, message):
         contract = self.contract
         if message['status'] == 'COMMITTED':
-            contract.state='DONE'
+            contract.state = 'DONE'
             contract.save()
             details = contract.get_details()
             details.investment_tx_hash = message['transactionHash']
@@ -173,3 +177,9 @@ class ContractDetailsInvestmentPool(CommonDetails):
         contract = self.contract
         contract.state = 'CANCELLED'
         contract.save()
+
+
+
+@contract_details('Investment Pool')
+class ContractDetailsInvestmentPool(AbstractContractDetailsInvestmentPool):
+    pass

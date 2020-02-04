@@ -8,8 +8,11 @@ from lastwill.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT
 from email_messages import *
 
 
-@contract_details('Deferred payment contract')
-class ContractDetailsDelayedPayment(CommonDetails):
+
+class AbstractContractDetailsDelayedPayment(CommonDetails):
+    class Meta:
+        abstract = True
+
     sol_path = 'lastwill/delayed-payment/'
     source_filename = 'contracts/DelayedPayment.sol'
     result_filename = 'build/contracts/DelayedPayment.json'
@@ -84,3 +87,9 @@ class ContractDetailsDelayedPayment(CommonDetails):
     @postponable
     def deploy(self):
         return super().deploy()
+
+
+
+@contract_details('Deferred payment contract')
+class ContractDetailsDelayedPayment(AbstractContractDetailsDelayedPayment):
+    pass
