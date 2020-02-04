@@ -32,7 +32,8 @@ from lastwill.contracts.models import (
     ContractDetailsTokenProtector, ApprovedToken,
     # ContractDetailsDUCATUSXLastwill,
     # ContractDetailsDUCATUSXLostKey, ContractDetailsDUCATUSXDelayedPayment,
-    # ContractDetailsDUCATUSXICO, ContractDetailsDUCATUSXToken,
+    # ContractDetailsDUCATUSXICO,
+    ContractDetailsDUCATUSXToken,
     # ContractDetailsDUCATUSXAirdrop, ContractDetailsDUCATUSXInvestmentPool,
     # ContractDetailsDUCATUSXLostKeyTokens
 )
@@ -316,12 +317,12 @@ class ContractSerializer(serializers.ModelSerializer):
             20: ContractDetailsSWAPSSerializer,
             22: ContractDetailsSTOSerializer,
             21: ContractDetailsSWAPS2Serializer,
-            23: TokenProtectorSerializer
+            23: TokenProtectorSerializer,
             # 24: ContractDetailsDUCATUSXLastwillSerializer,
             # 25: ContractDetailsDUCATUSXLostKeySerializer,
             # 26: ContractDetailsDUCATUSXDelayedPaymentSerializer,
             # 27: ContractDetailsDUCATUSXICOSerializer,
-            # 28: ContractDetailsDUCATUSXTokenSerializer,
+            28: ContractDetailsDUCATUSXTokenSerializer,
             # 29: ContractDetailsDUCATUSXAirdropSerializer,
             # 30: ContractDetailsDUCATUSXInvestmentPoolSerializer,
             # 31: ContractDetailsDUCATUSXLostKeyTokensSerializer
@@ -1759,9 +1760,9 @@ class ContractDetailsSTOSerializer(serializers.ModelSerializer):
 #     class Meta(ContractDetailsICOSerializer.Meta):
 #         model = ContractDetailsDUCATUSXICO
 #
-# class ContractDetailsDUCATUSXTokenSerializer(ContractDetailsTokenSerializer):
-#     class Meta(ContractDetailsTokenSerializer.Meta):
-#         model = ContractDetailsDUCATUSXToken
+class ContractDetailsDUCATUSXTokenSerializer(ContractDetailsTokenSerializer):
+    class Meta(ContractDetailsTokenSerializer.Meta):
+        model = ContractDetailsDUCATUSXToken
 #
 # class ContractDetailsDUCATUSXAirdropSerializer(ContractDetailsAirdropSerializer):
 #     class Meta(ContractDetailsAirdropSerializer.Meta):
