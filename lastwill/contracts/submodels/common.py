@@ -314,6 +314,7 @@ class Contract(models.Model):
             self.contract_type
         ).__name__.lower()+'_set').first()
 
+
     @classmethod
     def get_all_details_model(cls):
         contract_details_types = {}

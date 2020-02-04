@@ -11,32 +11,32 @@ from .lostkey import ContractDetailsLostKeyTokens
 
 @contract_details('DUCATUSX Will contract')
 class ContractDetailsDUCATUSXLastwill(ContractDetailsLastwill):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Wallet contract (lost key)')
 class ContractDetailsDUCATUSXLostKey(ContractDetailsLostKey):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Deferred payment contract')
 class ContractDetailsDUCATUSXDelayedPayment(ContractDetailsDelayedPayment):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX MyWish ICO')
 class ContractDetailsDUCATUSXICO(ContractDetailsICO):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Token contract')
 class ContractDetailsDUCATUSXToken(ContractDetailsToken):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Airdrop')
 class ContractDetailsDUCATUSXAirdrop(ContractDetailsAirdrop):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Investment Pool')
 class ContractDetailsDUCATUSXInvestmentPool(ContractDetailsInvestmentPool):
-    pass
+    contract = models.ForeignKey(Contract)
 
 @contract_details('DUCATUSX Wallet contract (lost key)')
 class ContractDetailsDUCATUSXLostKeyTokens(ContractDetailsLostKeyTokens):
-    pass
+    contract = models.ForeignKey(Contract)
