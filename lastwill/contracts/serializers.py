@@ -215,6 +215,7 @@ class ContractSerializer(serializers.ModelSerializer):
 
     def to_representation(self, contract):
         res = super().to_representation(contract)
+        print('CONTRACT', contract.id, flush=True)
         res['contract_details'] = self.get_details_serializer(
             contract.contract_type
         )(context=self.context).to_representation(contract.get_details())
