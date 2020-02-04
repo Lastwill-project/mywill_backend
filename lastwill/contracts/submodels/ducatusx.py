@@ -3,7 +3,7 @@ from .lostkey import ContractDetailsLostKey
 from .deffered import ContractDetailsDelayedPayment
 from .ico import ContractDetailsICO
 from .ico import ContractDetailsToken
-from .airdrop import ContractDetailsAirdrop
+from .airdrop import ContractDetailsAirdrop, AbstractContractDetailsAirdrop
 from .investment_pool import ContractDetailsInvestmentPool
 from .lostkey import ContractDetailsLostKeyTokens
 import datetime
@@ -258,9 +258,9 @@ class ContractDetailsDUCATUSXToken(CommonDetails):
         pass
 
 
-class AbstractContractDetailsAirdrop(ContractDetailsAirdrop):
-    class Meta:
-        abstract = True
+# class AbstractContractDetailsAirdrop(ContractDetailsAirdrop):
+#     class Meta:
+#         abstract = True
 
 @contract_details('DUCATUSX Airdrop')
 class ContractDetailsDUCATUSXAirdrop(AbstractContractDetailsAirdrop):

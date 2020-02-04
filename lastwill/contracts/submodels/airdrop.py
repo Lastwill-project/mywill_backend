@@ -15,8 +15,10 @@ class AirdropAddress(models.Model):
     )
 
 
-@contract_details('Airdrop')
-class ContractDetailsAirdrop(CommonDetails):
+# @contract_details('Airdrop')
+class AbstractContractDetailsAirdrop(CommonDetails):
+    class Meta:
+        abstract = True
 
     contract = models.ForeignKey(Contract, null=True)
     admin_address = models.CharField(max_length=50)
@@ -108,3 +110,8 @@ class ContractDetailsAirdrop(CommonDetails):
                                               active=True).count() == 0:
             self.contract.state = 'ENDED'
             self.contract.save()
+
+
+@contract_details('Airdrop')
+class ContractDetailsAirdrop(AbstractContractDetailsAirdrop):
+    pass
