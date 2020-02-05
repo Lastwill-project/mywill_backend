@@ -1070,10 +1070,15 @@ def autodeploing(user_id, subsite_id):
     bb = UserSiteBalance.objects.get(subsite__id=subsite_id, user__id=user_id)
     if subsite_id == 4:
         contract_type = 20
+        contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type,
+                                            network__name='ETHEREUM_MAINNET', state='WAITING_FOR_PAYMENT').order_by(
+            '-created_date')
     else:
         # subsite_id == 5:
         contract_type = 23
-    contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type, network__name='ETHEREUM_MAINNET', state='WAITING_FOR_PAYMENT').order_by('-created_date')
+        contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type,
+                                            state='WAITING_FOR_PAYMENT').order_by('-created_date')
+    # contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type, network__name='ETHEREUM_MAINNET', state='WAITING_FOR_PAYMENT').order_by('-created_date')
     for contract in contracts:
         print('check5', flush=True)
         contract_details = contract.get_details()
@@ -1130,7 +1135,8 @@ def confirm_protector_info(request):
     if contract.contract_type != 23:
         print(2, flush=True)
         raise PermissionDenied
-    if contract.network.name != 'ETHEREUM_MAINNET':
+    if contract.network.name not in ['ETHEREUM_MAINNET', 'ETHEREUM_ROPSTEN']:
+        print(2.5, flush=True)
         raise PermissionDenied
     if host != TOKEN_PROTECTOR_URL:
         print(3, flush=True)
