@@ -90,7 +90,7 @@ class AbstractContractDetailsLastwill(CommonDetails):
             [h.percentage for h in self.contract.heir_set.all()],
             self.check_interval,
             False if self.contract.network.name in
-                     ['ETHEREUM_MAINNET', 'ETHEREUM_ROPSTEN'] else True,
+                     ['ETHEREUM_MAINNET', 'ETHEREUM_ROPSTEN', 'DUCATUSX_MAINNET', 'DUCATUSX_TESTNET'] else True,
         ]
 
     @classmethod
