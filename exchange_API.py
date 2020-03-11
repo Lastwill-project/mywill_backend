@@ -97,6 +97,9 @@ def convert(fsym, tsyms):
             reverse_convert_wish = True
             wish_factor = 1 / wish_factor
 
+    if fsym == 'DUC' and tsyms == 'USD':
+        return {'USD': 0.05}
+
     if fsym not in allowed or any([x not in allowed for x in tsyms.split(',')]):
         raise Exception('currency not allowed')
     # print(fsym, tsyms)
