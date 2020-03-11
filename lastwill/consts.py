@@ -108,15 +108,18 @@ TRON_REPLENISH_THRESHOLD = {
     'MIN_TRX': 1000000
 }
 
-URL_STATS_CURRENCY_BODY = 'https://api.coinmarketcap.com/v1/ticker/'
+URL_STATS_CURRENCY_BODY = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
 URL_STATS_CURRENCY = {
-    'MYWISH': URL_STATS_CURRENCY_BODY + "mywish/",
-    'MYWISH_ETH': URL_STATS_CURRENCY_BODY + "mywish/?convert=ETH",
-    'BTC': URL_STATS_CURRENCY_BODY + "bitcoin/",
-    'EOS': URL_STATS_CURRENCY_BODY + "eos/",
-    'ETH': URL_STATS_CURRENCY_BODY + "ethereum/",
+    'CoinMarketCap': 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
     'EOSISH': "https://api.coingecko.com/api/v3/simple/price?ids=eosish&vs_currencies=eos",
     'RUB': "https://api.cryptonator.com/api/ticker/usd-rub",
+}
+
+URL_STATS_CURRENCY_ID = {
+    'MYWISH': 2236,
+    'BTC': 1,
+    'ETH': 1027,
+    'EOS': 1765
 }
 
 URL_STATS_ETH_QUERY = 'api?module=account&action=balance&address='

@@ -38,7 +38,7 @@ from lastwill.contracts.api import (ContractViewSet, get_code, test_comp,
                                     get_tronish_balance, confirm_swaps_info, confirm_protector_info,
                                     get_contract_for_unique_link, get_public_contracts,
                                     change_contract_state, send_message_author_swap, confirm_protector_tokens,
-                                    get_test_tokens)
+                                    get_test_tokens, skip_protector_approve)
 from lastwill.contracts.api_eos import (create_eos_account, deploy_eos_account,
                                         show_eos_account, edit_eos_account,
                                         calculate_cost_eos_account, calculate_cost_eos_account_contract,
@@ -49,7 +49,7 @@ from lastwill.contracts.api_eth import (create_eth_token, show_eth_token,
                                         deploy_eth_token, calculate_cost_eth_token_contract,
                                         get_source_code_eth_token)
 from lastwill.contracts.api_common import get_contract_price, get_contracts, get_available_contracts
-from lastwill.other.api import SentenceViewSet, send_unblocking_info, send_ducatus_form_info
+from lastwill.other.api import SentenceViewSet, send_unblocking_info
 from lastwill.social.views import FacebookLogin, GoogleLogin, MetamaskLogin, FacebookAuth
 from lastwill.promo.api import get_discount, get_all_promos_api
 from lastwill.snapshot.api import snapshot_get_value
@@ -127,7 +127,6 @@ urlpatterns = [
     url(r'^api/buy_brand_report/$', buy_brand_report),
     url(r'^api/get_authio_cost/$', get_authio_cost),
     url(r'^api/send_unblocking_feedback/$', send_unblocking_info),
-    url(r'^api/send_ducatus_feedback/$', send_ducatus_form_info),
     url(r'^api/calculate_cost_eos_account/$', calculate_cost_eos_account),
     url(r'^api/calculate_cost_eos_account_contract/$', calculate_cost_eos_account_contract),
     url(r'^api/delete_eos_account_contract/$', delete_eos_account_contract),
@@ -158,6 +157,7 @@ urlpatterns = [
     url(r'^api/confirm_swaps_info/$', confirm_swaps_info),
     url(r'^api/confirm_protector_info/$', confirm_protector_info),
     url(r'^api/confirm_protector_tokens/$', confirm_protector_tokens),
+    url(r'^api/skip_protector_approve/$', skip_protector_approve),
     url(r'^api/get_test_tokens/$', get_test_tokens),
     url(r'^api/get_contract_for_unique_link/$', get_contract_for_unique_link),
     url(r'^api/get_public_contracts/$', get_public_contracts),

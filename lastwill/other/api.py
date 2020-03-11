@@ -40,25 +40,3 @@ def send_unblocking_info(request):
     )
     return Response({'result': 'ok'})
 
-
-@api_view(http_method_names=['POST'])
-def send_ducatus_form_info(request):
-    name = request.data.get('name')
-    email = request.data.get('email')
-    phone_number = request.data.get('socialNetwork')
-    message = request.data.get('message')
-    text = """
-    Name: {name}
-    E-mail: {email}
-    Message: {message}
-    Phone: {phone}
-    """.format(
-        name=name, email=email, phone=phone_number, message=message
-    )
-    send_mail(
-        'Request from rocknblock.io contact form',
-        text,
-        DEFAULT_FROM_EMAIL,
-        [UNBLOCKING_EMAIL]
-    )
-    return Response({'result': 'ok'})

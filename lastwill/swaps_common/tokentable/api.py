@@ -154,7 +154,7 @@ def get_coins_rate(request):
     url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
     headers = {
         'Accepts': 'application/json',
-        'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEYS[0],
+        'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEYS[1],
     }
     session = Session()
     try:

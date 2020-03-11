@@ -6,7 +6,6 @@ from lastwill.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT
 from django.db import models
 from ethereum.utils import checksum_encode
 from web3 import Web3, HTTPProvider, IPCProvider
-import binascii
 
 
 @contract_details('Token protector contract')
@@ -21,6 +20,11 @@ class ContractDetailsTokenProtector(CommonDetails):
 
     temp_directory = models.CharField(max_length=36)
 
+    approving_time = models.IntegerField(null=True, default=None)
+
+    day_mail_sent = models.BooleanField(default=False)
+    week_mail_sent = models.BooleanField(default=False)
+
     def predeploy_validate(self):
         # now = timezone.now().timestamp()
         if self.end_timestamp < timezone.now().timestamp() + 30 * 60:
@@ -34,6 +38,17 @@ class ContractDetailsTokenProtector(CommonDetails):
         self.eth_contract.save()
         self.contract.state = 'WAITING_FOR_APPROVE'
         self.contract.save()
+        email = self.email if self.email else self.contract.user.email
+        print('email', email, flush=True)
+        try:
+            send_mail(
+                protector_deployed_subject,
+                protector_deployed_text,
+                DEFAULT_FROM_EMAIL,
+                [email]
+            )
+        except Exception as err:
+            print('deployed mail failed', str(err), flush=True)
 
     @classmethod
     def min_cost(cls):
@@ -114,21 +129,63 @@ class ContractDetailsTokenProtector(CommonDetails):
         return [
         ]
 
+    def try_confirm_execute(self):
+        if self.approving_time:
+            front_tokens_count = len(ApprovedToken.objects.filter(contract=self, approve_from_front=True))
+            approved_tokens_count = len(
+                ApprovedToken.objects.filter(contract=self, approve_from_scanner=True, approve_from_front=True))
+            if approved_tokens_count == front_tokens_count:
+                self.approving_time = None
+                self.save()
+                self.confirm_tokens()
+
+
     @check_transaction
     def TokenProtectorApprove(self, message):
+        token_address = message['tokenAddress'].lower()
         if int(message['tokens']) > 0:
-            if not ApprovedToken.objects.filter(contract=self, address=message['tokenAddress']).first():
-                approved_token = ApprovedToken(contract=self, address=message['tokenAddress'])
+            approved_token = ApprovedToken.objects.filter(contract=self, address=token_address).first()
+            if not approved_token:
+                approved_token = ApprovedToken(contract=self, address=token_address,
+                                               approve_from_scanner=True)
                 approved_token.save()
+                print('approved from scanner', flush=True)
             else:
-                print('already approved', flush=True)
+                approved_token.approve_from_scanner = True
+                approved_token.save()
+                print('already approved, scanner', flush=True)
         else:
-            disapproved_token = ApprovedToken.objects.filter(contract=self, address=message['tokenAddress']).first()
+            disapproved_token = ApprovedToken.objects.filter(contract=self, address=token_address).first()
             if disapproved_token:
                 disapproved_token.delete()
 
+        self.try_confirm_execute()
+
+
+    def approve_from_front(self, tokens):
+        for token in tokens:
+            token = token.lower()
+            approved_token = ApprovedToken.objects.filter(contract=self, address=token).first()
+            if not approved_token:
+                approved_token = ApprovedToken(contract=self, address=token,
+                                               approve_from_front=True)
+                approved_token.save()
+                print('approved from front')
+            else:
+                approved_token.approve_from_front = True
+                approved_token.save()
+                print('already approved, front', flush=True)
+
+        self.approving_time = datetime.datetime.now().timestamp()
+        self.save()
+        if self.contract.state == 'WAITING_FOR_APPROVE':
+            self.contract.state = 'WAITING_FOR_CONFIRM'
+            self.contract.save()
+
+        self.try_confirm_execute()
+
+
     def confirm_tokens(self):
-        # try:
         eth_int = EthereumProvider().get_provider(network=self.contract.network.name)
         w3 = Web3(HTTPProvider(eth_int.url))
         contract = w3.eth.contract(address=checksum_encode(self.eth_contract.address), abi=self.eth_contract.abi)
@@ -156,11 +213,7 @@ class ContractDetailsTokenProtector(CommonDetails):
 
         print('hash', tx_hash, flush=True)
 
-        self.contract.state = 'WAITING_FOR_CONFIRM'
-        self.contract.save()
-        # except:
-        #     self.contract.state = 'FAIL_IN_CONFIRM'
-        #     self.contract.save()
+
 
     def TokenProtectorTokensToSave(self, message):
         for approved_token in ApprovedToken.objects.filter(contract=self, is_confirmed=False):
@@ -170,11 +223,8 @@ class ContractDetailsTokenProtector(CommonDetails):
         self.contract.state = 'ACTIVE'
         self.contract.save()
 
+
     def execute_contract(self):
-        # try:
-        w3 = Web3(HTTPProvider('http://{host}:{port}'.format(host=NETWORKS[self.contract.network.name]['host'],
-                                                             port=NETWORKS[self.contract.network.name]['port'])))
-        # contract = w3.eth.contract(address=checksum_encode(self.eth_contract.address), abi=self.eth_contract.abi)
 
         eth_int = EthereumProvider().get_provider(network=self.contract.network.name)
         nonce = int(eth_int.eth_getTransactionCount(NETWORKS[self.contract.network.name]['address'], "pending"), 16)
@@ -193,16 +243,36 @@ class ContractDetailsTokenProtector(CommonDetails):
         self.contract.state = 'WAITING_FOR_EXECUTION'
         self.contract.save()
 
+
     def TokenProtectorTransactionInfo(self, message):
         self.contract.state = 'DONE'
         self.contract.save()
+
 
     def SelfdestructionEvent(self, message):
         self.contract.state = 'CANCELLED'
         self.contract.save()
 
 
+    def execution_before_mail(self, days):
+        email = self.email if self.email else self.contract.user.email
+        send_mail(
+            protector_execution_subject,
+            protector_execution_text.format(days=days),
+            DEFAULT_FROM_EMAIL,
+            [email]
+        )
+        if days == 1:
+            self.day_mail_sent = True
+        else:
+            self.week_mail_sent = True
+        self.save()
+
+
+
 class ApprovedToken(models.Model):
     contract = models.ForeignKey(ContractDetailsTokenProtector, related_name='tokens', on_delete=models.CASCADE)
     address = models.CharField(max_length=50)
     is_confirmed = models.BooleanField(default=False)
+    approve_from_scanner = models.BooleanField(default=False)
+    approve_from_front = models.BooleanField(default=False)

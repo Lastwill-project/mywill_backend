@@ -45,7 +45,7 @@ from lastwill.settings import EMAIL_HOST_USER_SWAPS, EMAIL_HOST_PASSWORD_SWAPS
 from lastwill.consts import NET_DECIMALS
 from lastwill.profile.models import *
 from lastwill.payments.api import create_payment
-from exchange_API import convert
+from exchange_API import convert, bnb_to_wish
 from lastwill.consts import MAIL_NETWORK
 import email_messages
 from neocore.Cryptography.Crypto import Crypto
@@ -138,6 +138,8 @@ class TokenHolderSerializer(serializers.ModelSerializer):
         fields = ('address', 'amount', 'freeze_date', 'name')
 
 
+
+
 class ContractSerializer(serializers.ModelSerializer):
     contract_details = serializers.JSONField(write_only=True)
 
@@ -189,7 +191,7 @@ class ContractSerializer(serializers.ModelSerializer):
         if validated_data['user'].email:
             network = validated_data['network']
             network_name = MAIL_NETWORK[network.name]
-            if contract.contract_type not in (11, 20, 21):
+            if contract.contract_type not in (11, 20, 21, 23):
                 send_mail(
                     email_messages.create_subject,
                     email_messages.create_message.format(
@@ -203,6 +205,14 @@ class ContractSerializer(serializers.ModelSerializer):
                     email_messages.swaps_subject,
                     email_messages.swaps_message,
                     validated_data['user'].email
+                )
+            elif contract.contract_type == 23:
+                email = contract_details['email'] if contract_details['email'] else validated_data['user'].email
+                send_mail(
+                    email_messages.protector_create_subject,
+                    email_messages.protector_create_text,
+                    DEFAULT_FROM_EMAIL,
+                    [email]
                 )
             else:
                 send_mail(
@@ -256,7 +266,7 @@ class ContractSerializer(serializers.ModelSerializer):
         if contract.network.name == 'TRON_TESTNET':
             res['cost']['TRX'] = 0
             res['cost']['TRONISH'] = 0
-        if contract.contract_type == 20 or contract.contract_type == 23:
+        if contract.contract_type == 20:
             cost = Contract.get_details_model(
                 contract.contract_type
             ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
@@ -268,8 +278,19 @@ class ContractSerializer(serializers.ModelSerializer):
                 'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
                 'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP'])
             }
+        elif contract.contract_type == 23:
+            cost = Contract.get_details_model(
+                contract.contract_type
+            ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
+            res['cost'] = {
+                'USDT': str(int(cost * NET_DECIMALS['USDT'])),
+                'ETH': str(int(cost) * convert('USDT', 'ETH')['ETH'] * NET_DECIMALS['ETH']),
+                'WISH': str(int(cost) * convert('USDT', 'BNB')['BNB'] * bnb_to_wish() * NET_DECIMALS['WISH']),
+                'BTC': str(int(cost) * convert('USDT', 'BTC')['BTC'] * NET_DECIMALS['BTC']),
+                'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
+                'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP'])
+            }
 
-        # print('representation', res, flush=True)
 
         return res
 
@@ -343,6 +364,13 @@ class TokenProtectorSerializer(serializers.ModelSerializer):
             print('TIME_IS_UP', flush=True)
             contract_details.contract.state = 'TIME_IS_UP'
             contract_details.contract.save()
+        if contract_details.approving_time:
+            if contract_details.approving_time + 10 * 60 < datetime.datetime.now().timestamp():
+                print('POSTPONED', flush=True)
+                contract_details.approving_time = None
+                contract_details.save()
+                contract_details.contract.state = 'POSTPONED'
+                contract_details.contract.save()
         res = super().to_representation(contract_details)
         res['eth_contract'] = EthContractSerializer().to_representation(contract_details.eth_contract)
         if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
@@ -377,7 +405,9 @@ class TokenProtectorSerializer(serializers.ModelSerializer):
         if 'owner_address' not in contract_details or 'reserve_address' not in contract_details or 'end_timestamp' not in contract_details:
             raise ValidationError
         check.is_address(contract_details['owner_address'])
+        contract_details['owner_address'] = contract_details['owner_address'].lower()
         check.is_address(contract_details['reserve_address'])
+        contract_details['reserve_address'] = contract_details['reserve_address'].lower()
         if contract_details['end_timestamp'] < timezone.now().timestamp() + 30 * 60:
             raise ValidationError
 

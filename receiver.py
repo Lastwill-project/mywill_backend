@@ -7,6 +7,7 @@ import json
 import sys
 from types import FunctionType
 import datetime
+import fcntl
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastwill.settings')
 import django
@@ -278,6 +279,13 @@ class Receiver(threading.Thread):
         try:
             message = json.loads(body.decode())
             if message.get('status', '') == 'COMMITTED' or properties.type in ('airdrop', 'finalized'):
+                write_flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
+                write_blocking = write_flags & os.O_NONBLOCK
+                if write_blocking != 0:
+                    print('Blocking write mode detected. Resetting blocking flag, previous was:',
+                          write_blocking, flush=True
+                          )
+                    fcntl.fcntl(1, fcntl.F_SETFL, 0)
                 getattr(self, properties.type, self.unknown_handler)(message)
         except (TxFail, AlreadyPostponed):
             ch.basic_ack(delivery_tag=method.delivery_tag)
