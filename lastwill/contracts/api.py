@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from collections import OrderedDict
 
 from lastwill.settings import BASE_DIR, ETHERSCAN_API_KEY
-from lastwill.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_URL, TOKEN_PROTECTOR_URL
+from lastwill.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_URL, TOKEN_PROTECTOR_URL, DUCATUSX_URL
 from lastwill.permissions import IsOwner, IsStaff
 from lastwill.snapshot.models import *
 from lastwill.promo.api import check_and_get_discount
@@ -86,7 +86,7 @@ class ContractViewSet(ModelViewSet):
         host = self.request.META['HTTP_HOST']
         print('host is', host, flush=True)
         if host == MY_WISH_URL:
-            result = result.exclude(contract_type__in=[20, 21, 22, 23])
+            result = result.exclude(contract_type__in=[20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])
             # result = result.exclude(contract_type__in=[20, 21, 22])
         if host == EOSISH_URL:
             result = result.filter(contract_type__in=(10, 11, 12, 13, 14))
@@ -99,6 +99,8 @@ class ContractViewSet(ModelViewSet):
             result = result.filter(contract_type=22)
         if host == TOKEN_PROTECTOR_URL:
             result = result.filter(contract_type__in=[23])
+        if host == DUCATUSX_URL:
+            result = result.filter(contract_type__in=[24, 25, 26, 27, 28, 29, 30, 31])
         if self.request.user.is_staff:
             return result
         return result.filter(user=self.request.user)
