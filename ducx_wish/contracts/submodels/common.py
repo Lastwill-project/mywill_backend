@@ -13,12 +13,6 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 
-from neo.Settings import settings
-from neo.Core.Witness import Witness
-from neocore.Cryptography.Crypto import Crypto
-from neocore.UInt160 import UInt160
-
-
 from ducx_wish.settings import SIGNER, CONTRACTS_DIR, CONTRACTS_TEMP_DIR
 from ducx_wish.parint import *
 from ducx_wish.consts import MAX_WEI_DIGITS, MAIL_NETWORK

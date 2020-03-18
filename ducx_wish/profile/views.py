@@ -30,14 +30,12 @@ from allauth.account.utils import (
     url_str_to_user_pk,
 )
 from allauth.account.models import EmailAddress, EmailConfirmation, EmailConfirmationHMAC
-from tron_wif.hex2wif import hex2tronwif
 
 from exchange_API import to_wish, convert
 from ducx_wish.contracts.models import Contract
 from ducx_wish.profile.helpers import valid_totp
 from ducx_wish.settings import BINANCE_PAYMENT_ADDRESS, MY_WISH_URL, SUPPORT_EMAIL, DEFAULT_FROM_EMAIL, WAVES_URL
 from ducx_wish.profile.models import SubSite, UserSiteBalance, APIToken
-from ducx_wish.swaps_common.mailing.models import SwapsNotificationDefaults
 
 
 

@@ -6,7 +6,6 @@ from rest_framework import viewsets
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.permissions import IsAuthenticated
-from bs4 import BeautifulSoup
 from rest_framework.response import Response
 from collections import OrderedDict
 
@@ -15,9 +14,8 @@ from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_
 from ducx_wish.permissions import IsOwner, IsStaff
 from ducx_wish.snapshot.models import *
 from ducx_wish.promo.api import check_and_get_discount
-from ducx_wish.contracts.api_eos import *
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
-    ContractDetailsInvestmentPool, InvestAddress, EOSAirdropAddress, implement_cleos_command, CurrencyStatisticsCache
+    ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
 from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
@@ -25,7 +23,6 @@ from email_messages import authio_message, authio_subject, authio_google_subject
 from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer, EOSAirdropAddressSerializer, deploy_swaps, deploy_protector, ContractDetailsTokenSerializer
 from ducx_wish.consts import *
 import requests
-from ducx_wish.contracts.submodels.token_protector import ContractDetailsTokenProtector
 from django.db.models import Q
 
 BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/20100101 Firefox/69.0'}

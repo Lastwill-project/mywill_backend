@@ -5,7 +5,7 @@ from django.db.models import F
 
 from rest_framework.exceptions import ValidationError
 
-from ducx_wish.payments.models import InternalPayment, FreezeBalance
+from ducx_wish.payments.models import InternalPayment
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
 from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_URL, TOKEN_PROTECTOR_URL, NETWORKS
 from ducx_wish.consts import NET_DECIMALS
@@ -103,42 +103,6 @@ def add_decimals(currency, amount):
     return amount
 
 
-def freeze_payments(amount, network):
-    if network == 'EOS_MAINNET':
-    #if currency in ('EOS', 'EOSISH'):
-        value = amount * 0.15 * NET_DECIMALS['EOSISH'] / NET_DECIMALS['ETH']
-        value *= convert('WISH', 'EOSISH')['EOSISH']
-        #value = float(':.4f'.format(value)
-        FreezeBalance.objects.select_for_update().filter(id=1).update(
-            eosish=F('eosish') + value
-        )
-        print('FREEZE', value, 'EOSISH', flush=True)
-    elif network == 'TRON_MAINNET':
-    #elif currency in ('TRON', 'TRONISH'):
-        value = amount * 0.10 * NET_DECIMALS['TRX'] / NET_DECIMALS['ETH']
-        value *= convert('WISH', 'TRONISH')['TRONISH']
-        FreezeBalance.objects.select_for_update().filter(id=1).update(
-            tronish=F('tronish') + int(value)
-        )
-        wish_value = amount * 0.10
-        FreezeBalance.objects.select_for_update().filter(id=1).update(
-            wish=F('wish') + wish_value
-        )
-        print('FREEZE', int(value), 'TRONISH', flush=True)
-        #print('FREEZE', wish_value, 'WISH', flush=True)
-    #elif currency in ('BNB', 'BWISH'):
-    else:
-        value = amount * 0.10
-        FreezeBalance.objects.select_for_update().filter(id=1).update(
-            bwish=F('bwish') + value
-        )
-        print('FREEZE', value, 'BWISH', flush=True)
-    # if network == 'ETHEREUM_MAINNET':
-    #    value = amount * 0.10
-    #    FreezeBalance.objects.select_for_update().filter(id=1).update(
-    #        wish=F('wish') + value
-    #    )
-    #    print('FREEZE', value, 'WISH', flush=True)
 
 
 def positive_payment(user, value, site_id, currency, amount):
@@ -152,8 +116,6 @@ def negative_payment(user, value, site_id, network):
             user=user, subsite__id=site_id, balance__gte=value
     ).update(balance=F('balance') - value):
         raise ValidationError({'result': 3}, code=400)
-    if not NETWORKS[network]['is_free']:
-        freeze_payments(value, network)
 
 
 def get_payment_statistics(start, stop=None):
