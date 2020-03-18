@@ -2,7 +2,7 @@ import time
 import pika
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastwill.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ducx_wish.settings')
 import django
 
 django.setup()
@@ -10,9 +10,9 @@ django.setup()
 from django.utils import timezone
 from django.core.mail import send_mail
 
-from lastwill.contracts.models import Contract
-from lastwill.parint import *
-from lastwill.settings import DEFAULT_FROM_EMAIL, LASTWILL_ALIVE_TIMEOUT
+from ducx_wish.contracts.models import Contract
+from ducx_wish.parint import *
+from ducx_wish.settings import DEFAULT_FROM_EMAIL, LASTWILL_ALIVE_TIMEOUT
 import email_messages
 import datetime
 

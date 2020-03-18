@@ -10,7 +10,7 @@ __pycache__/
 */contracts/__pycache__/
 */*/__pycache__/
 lastwill-frontend/
-lastwill/static_collect/
+ducx_wish/static_collect/
 mywill_frontend/
 mywill_sign/
 test.py
@@ -24,13 +24,13 @@ db*
 celery_dir/
 celerybeat-schedule
 gunicorn.conf.py
-lastwill/contracts/serializers.py.save
+ducx_wish/contracts/serializers.py.save
 temp/
 test_btc_addreses.txt
 env/
 jon.cs
 jon_new.cs
-lastwill/contracts/submodels/common.py.save
+ducx_wish/contracts/submodels/common.py.save
 slogger.py
 templates/wstest.html
 ws_test.py

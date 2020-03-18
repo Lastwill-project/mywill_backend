@@ -10,7 +10,7 @@ import pika
 from pika import exceptions
 from pika.adapters import twisted_connection
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastwill.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ducx_wish.settings')
 import django
 django.setup()
 from django.http.cookie import parse_cookie

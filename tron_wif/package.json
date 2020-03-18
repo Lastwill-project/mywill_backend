@@ -1,9 +1,0 @@
-{
-  "name": "convert_tron_python",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
-    "tronweb": "^2.1.31"
-  }
-}

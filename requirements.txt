@@ -17,11 +17,6 @@ ethereum==2.0.4
 gunicorn==19.7.1
 idna==2.6
 kombu==4.1.0
-neo-boa==0.3.7
--e git+https://github.com/CityOfZion/neo-python.git@42e0bb41866d0b2c7aa3ee460a8f8ce3ae2f1f22#egg=neo_python
-neo-python-rpc==0.2.0
-neocore==0.3.8
-neojsonrpc==0.1.1
 oauthlib==2.0.2
 pbkdf2==1.3
 pika==0.11.0

@@ -2,7 +2,7 @@ import requests
 import json
 import time
 from binance.client import Client
-from lastwill.settings import BINANCE_PAYMENT_ADDRESS, BINANCE_PAYMENT_PASSWORD
+from ducx_wish.settings import BINANCE_PAYMENT_ADDRESS, BINANCE_PAYMENT_PASSWORD
 
 
 class memoize_timeout:

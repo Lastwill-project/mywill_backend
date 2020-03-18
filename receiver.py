@@ -9,7 +9,7 @@ from types import FunctionType
 import datetime
 import fcntl
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lastwill.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ducx_wish.settings')
 import django
 django.setup()
 from django.utils import timezone
@@ -17,17 +17,17 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.models.signals import post_save
 
-from lastwill.contracts.models import (
-    Contract, EthContract, TxFail, NeedRequeue, AlreadyPostponed,
+from ducx_wish.contracts.models import (
+    Contract, DUCXContract, TxFail, NeedRequeue, AlreadyPostponed,
     WhitelistAddress, ContractDetailsSWAPS2
 )
-from lastwill.swaps_common.orderbook.models import OrderBookSwaps
-from lastwill.contracts.serializers import ContractSerializer
-from lastwill.contracts.api import autodeploing
-from lastwill.settings import NETWORKS
-from lastwill.deploy.models import DeployAddress
-from lastwill.payments.api import create_payment
-from lastwill.profile.models import Profile
+from ducx_wish.swaps_common.orderbook.models import OrderBookSwaps
+from ducx_wish.contracts.serializers import ContractSerializer
+from ducx_wish.contracts.api import autodeploing
+from ducx_wish.settings import NETWORKS
+from ducx_wish.deploy.models import DeployAddress
+from ducx_wish.payments.api import create_payment
+from ducx_wish.profile.models import Profile
 from exchange_API import to_wish
 
 
@@ -73,7 +73,7 @@ class Receiver(threading.Thread):
 
     def deployed(self, message):
         print('deployed message received', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         if contract.state == 'ACTIVE':
             print('ignored because already active', flush=True)
             return
@@ -99,7 +99,7 @@ class Receiver(threading.Thread):
 
     def killed(self, message):
         print('killed message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.state = 'KILLED'
         contract.save()
         network = contract.network
@@ -108,13 +108,13 @@ class Receiver(threading.Thread):
 
     def checked(self, message):
         print('checked message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().checked(message)
         print('checked ok', flush=True)
 
     def repeat_check(self, message):
         print('repeat check message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().check_contract()
         print('repeat check ok', flush=True)
 
@@ -127,31 +127,13 @@ class Receiver(threading.Thread):
 
     def triggered(self, message):
         print('triggered message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().triggered(message)
         print('triggered ok', flush=True)
 
-    def TokenProtectorApprove(self, message):
-        print('approved message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
-        contract.get_details().TokenProtectorApprove(message)
-        print('approved ok', flush=True)
-
-    def TokenProtectorTokensToSave(self, message):
-        print('confirm message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
-        contract.get_details().TokenProtectorTokensToSave(message)
-        print('confirmed ok', flush=True)
-
-    def TokenProtectorTransactionInfo(self, message):
-        print('contract execution message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
-        contract.get_details().TokenProtectorTransactionInfo(message)
-        print('executed ok', flush=True)
-
     def SelfdestructionEvent(self, message):
         print('contract destruct message', flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().SelfdestructionEvent(message)
         print('destructed ok', flush=True)
 
@@ -173,13 +155,13 @@ class Receiver(threading.Thread):
 
     def ownershipTransferred(self, message):
         print('ownershipTransferred message')
-        contract = EthContract.objects.get(id=message['crowdsaleId']).contract
+        contract = DUCXContract.objects.get(id=message['crowdsaleId']).contract
         contract.get_details().ownershipTransferred(message)
         print('ownershipTransferred ok')
 
     def initialized(self, message):
         print('initialized message')
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().initialized(message)
         print('initialized ok')
 
@@ -191,7 +173,7 @@ class Receiver(threading.Thread):
             order = OrderBookSwaps.objects.get(memo_contract=message['id'])
             order.finalized(message)
         else:
-            contract = EthContract.objects.get(id=message['contractId']).contract
+            contract = DUCXContract.objects.get(id=message['contractId']).contract
             contract.get_details().finalized(message)
         print('finish ok')
 
@@ -205,7 +187,7 @@ class Receiver(threading.Thread):
                  memo_contract=message['id'])
             order.finalized(message)
         else:
-            contract = EthContract.objects.get(
+            contract = DUCXContract.objects.get(
                 id=message['contractId']).contract
             contract.get_details().finalized(message)
         print('finalized ok')
@@ -216,7 +198,7 @@ class Receiver(threading.Thread):
             print('success, ignoring')
             return
         try:
-            contract = EthContract.objects.get(tx_hash=message['transactionHash']).contract
+            contract = DUCXContract.objects.get(tx_hash=message['transactionHash']).contract
             contract.get_details().tx_failed(message)
         except Exception as e:
             print(e)
@@ -244,7 +226,7 @@ class Receiver(threading.Thread):
 
     def notified(self, message):
         print('notified message')
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.last_reset = timezone.now()
         details.save()
@@ -252,7 +234,7 @@ class Receiver(threading.Thread):
 
     def fundsAdded(self, message):
         print('funds Added message')
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().fundsAdded(message)
         print('funds Added ok')
 
@@ -264,13 +246,13 @@ class Receiver(threading.Thread):
 
     def timesChanged(self, message):
         print('time changed message')
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().timesChanged(message)
         print('time changed ok')
 
     def airdrop(self, message):
         print(datetime.datetime.now(), flush=True)
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().airdrop(message)
         print(datetime.datetime.now(), flush=True)
 
@@ -302,14 +284,14 @@ class Receiver(threading.Thread):
         print('unknown message', message, flush=True)
 
     def whitelistAdded(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         address = message['address']
         w, _ = WhitelistAddress.objects.get_or_create(contract=contract, address=address)
         w.active = True
         w.save()
 
     def whitelistRemoved(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         address = message['address']
         try:
             w = WhitelistAddress.objects.get(contract=contract, address=address)
@@ -322,11 +304,11 @@ class Receiver(threading.Thread):
         pass
 
     def tokensSent(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         contract.get_details().tokenSent(message)
 
     def investmentPoolSetup(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         if message['investmentAddress']:
             details.investment_address = message['investmentAddress']
@@ -341,22 +323,22 @@ class Receiver(threading.Thread):
             order = OrderBookSwaps.objects.get(memo_contract=message['id'])
             order.cancelled(message)
         else:
-            contract = EthContract.objects.get(id=message['contractId']).contract
+            contract = DUCXContract.objects.get(id=message['contractId']).contract
             details = contract.get_details()
             details.cancelled(message)
 
     def refund(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.cancelled(message)
 
     def created(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.created(message)
 
     def newAccount(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         if contract.state == 'ACTIVE':
             print('ignored because already active', flush=True)
             return
@@ -364,12 +346,12 @@ class Receiver(threading.Thread):
         details.newAccount(message)
 
     def tokenCreated(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.tokenCreated(message)
 
     def setcode(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.setcode(message)
 
@@ -382,12 +364,12 @@ class Receiver(threading.Thread):
         order.deposit_order(message)
 
     def refundSwaps(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.refund_swaps(message)
 
     def depositSwaps(self, message):
-        contract = EthContract.objects.get(id=message['contractId']).contract
+        contract = DUCXContract.objects.get(id=message['contractId']).contract
         details = contract.get_details()
         details.deposit_swaps(message)
 
