@@ -42,8 +42,6 @@ from ducx_wish.contracts.api import (ContractViewSet, get_code, test_comp,
 from ducx_wish.contracts.api_common import get_contract_price, get_contracts, get_available_contracts
 from ducx_wish.other.api import SentenceViewSet, send_unblocking_info
 from ducx_wish.social.views import FacebookLogin, GoogleLogin, MetamaskLogin, FacebookAuth
-from ducx_wish.promo.api import get_discount, get_all_promos_api
-from ducx_wish.snapshot.api import snapshot_get_value
 
 router = DefaultRouter(trailing_slash=True)
 router.register(r'contracts', ContractViewSet)
@@ -99,7 +97,6 @@ urlpatterns = [
     url(r'^api/get_eos_cost/$', get_eos_cost),
     url(r'^api/get_eos_airdrop_cost/$', get_eos_airdrop_cost),
     url(r'^api/check_eos_accounts_exists/$', check_eos_accounts_exists),
-    url(r'^api/snapshot_get_value/$', snapshot_get_value),
     url(r'^api/buy_brand_report/$', buy_brand_report),
     url(r'^api/get_authio_cost/$', get_authio_cost),
     url(r'^api/send_unblocking_feedback/$', send_unblocking_info),
@@ -123,7 +120,6 @@ urlpatterns = [
     url(r'^api/change_contract_state/$', change_contract_state),
     url(r'^api/send_message_author_swap/$', send_message_author_swap),
     url(r'^contribute', redirect_contribute),
-    url(r'^api/get_all_promos/$', get_all_promos_api)
 ]
 
 urlpatterns += url(r'^/*', index, name='all'),

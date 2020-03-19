@@ -56,8 +56,6 @@ INSTALLED_APPS = [
     'ducx_wish.profile',
     'ducx_wish.payments',
     'ducx_wish.deploy',
-    'ducx_wish.promo',
-    'ducx_wish.snapshot',
 ]
 
 MIDDLEWARE = [

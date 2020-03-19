@@ -14,9 +14,6 @@ from collections import OrderedDict
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS
 from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_URL, TOKEN_PROTECTOR_URL
 from ducx_wish.permissions import IsOwner, IsStaff
-from ducx_wish.snapshot.models import *
-from ducx_wish.promo.models import Promo
-from ducx_wish.promo.api import check_and_get_discount
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
     ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
 from ducx_wish.deploy.models import Network
@@ -30,25 +27,6 @@ from django.db.models import Q
 
 BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/20100101 Firefox/69.0'}
 
-def check_and_apply_promocode(promo_str, user, cost, contract_type, cid):
-    wish_cost = to_wish('ETH', int(cost))
-    if promo_str:
-        try:
-            discount = check_and_get_discount(
-                promo_str, contract_type, user
-            )
-        except PermissionDenied:
-           promo_str = None
-        else:
-           cost = cost - cost * discount / 100
-        if promo_str:
-            Promo.objects.select_for_update().filter(
-                    promo_str=promo_str.upper()
-            ).update(
-                    use_count=F('use_count') + 1,
-                    referral_bonus=F('referral_bonus') + wish_cost
-            )
-    return cost
 
 
 def sendEMail(sub, text, mail):
@@ -154,33 +132,8 @@ def get_token_contracts(request):
     return Response(res)
 
 
-def check_error_promocode(promo_str, contract_type):
-    promo = Promo.objects.filter(promo_str=promo_str).first()
-    if promo:
-        promo2ct = Promo2ContractType.objects.filter(
-            promo=promo, contract_type=contract_type
-        ).first()
-        if not promo2ct:
-            promo_str = None
-    else:
-        promo_str = None
-    return promo_str
 
 
-def check_promocode(promo_str, user, cost, contract, details):
-    # check token with authio
-    if contract.contract_type == 5 and details.authio:
-        price_without_brand_report = contract.cost - 450 * NET_DECIMALS['USDT']
-        cost = check_and_apply_promocode(
-            promo_str, user, price_without_brand_report, contract.contract_type, contract.id
-        )
-        total_cost = cost + 450 * NET_DECIMALS['USDT']
-    else:
-        # count discount
-        total_cost = check_and_apply_promocode(
-            promo_str, user, cost, contract.contract_type, contract.id
-        )
-    return total_cost
 
 
 @api_view(http_method_names=['POST'])
@@ -196,16 +149,7 @@ def deploy(request):
     currency = 'USDT'
     site_id = 1
     network = contract.network.name
-    promo_str = request.data.get('promo', None)
-    if promo_str:
-        promo_str = promo_str.upper()
-    promo_str = check_error_promocode(promo_str, contract.contract_type) if promo_str else None
-    cost = check_promocode(promo_str, request.user, cost, contract, contract_details)
     create_payment(request.user.id, '', currency, -cost, site_id, network)
-    if promo_str:
-        promo_object = Promo.objects.get(promo_str=promo_str.upper())
-        User2Promo(user=request.user, promo=promo_object,
-                   contract_id=contract.id).save()
     contract.state = 'WAITING_FOR_DEPLOYMENT'
     contract.save()
     queue = NETWORKS[contract.network.name]['queue']
