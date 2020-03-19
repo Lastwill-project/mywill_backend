@@ -19,9 +19,8 @@ from django.db.models.signals import post_save
 
 from ducx_wish.contracts.models import (
     Contract, DUCXContract, TxFail, NeedRequeue, AlreadyPostponed,
-    WhitelistAddress, ContractDetailsSWAPS2
+    WhitelistAddress
 )
-from ducx_wish.swaps_common.orderbook.models import OrderBookSwaps
 from ducx_wish.contracts.serializers import ContractSerializer
 from ducx_wish.contracts.api import autodeploing
 from ducx_wish.settings import NETWORKS
