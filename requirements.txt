@@ -52,7 +52,6 @@ oauthlib==2.0.2
 parsimonious==0.8.1
 pbkdf2==1.3
 pika==0.11.0
-pkg-resources==0.0.0
 protobuf==3.11.3
 psycopg2==2.7.3
 psycopg2-binary==2.8.4
