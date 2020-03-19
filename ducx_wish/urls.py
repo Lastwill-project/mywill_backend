@@ -79,7 +79,6 @@ urlpatterns = [
     url(r'^api/rest-auth/google/$', GoogleLogin.as_view(), name='google_login'),
     url(r'^api/rest-auth/metamask/$', MetamaskLogin.as_view(), name='metamask_login'),
     url(r'^api/resend_email/', resend_email),
-    url(r'^api/get_discount/', get_discount),
     url(r'^/$', index, name='socialaccount_signup'),
     url(r'^api/count_sold_tokens_in_ICO/$', ICOtokensView.as_view(),
         name='count_ICOtokens'),
