@@ -40,7 +40,7 @@ NETWORK_SUBSITE = {
     'TRON_TESTNET': 1,
 }
 
-CONTRACT_PRICE_ETH = {
+CONTRACT_PRICE_DUC = {
     'AIRDROP': 0.5,
     'DEFFERED': 0.025,
     'ICO': 1,
@@ -193,13 +193,13 @@ ALL_CONTRACT_STATES = [
 ]
 
 API_CONTRACT_PRICES = [
-    {'contract_type': 0, 'contract_name': 'LastWill', 'price': 0.257 * NET_DECIMALS['DUC'], 'currency': 'ETH'},
-    {'contract_type': 1, 'contract_name': 'LostKey', 'price': 0.2 * NET_DECIMALS['ETH'], 'currency': 'ETH'},
-    {'contract_type': 2, 'contract_name': 'DefferedPayment', 'price': 0.025 * NET_DECIMALS['ETH'], 'currency': 'ETH'},
-    {'contract_type': 4, 'contract_name': 'ICO', 'price': CONTRACT_PRICE_ETH['ICO'] * NET_DECIMALS['ETH'], 'currency': 'ETH'},
-    {'contract_type': 5, 'contract_name': 'Token', 'price': CONTRACT_PRICE_ETH['TOKEN'] * NET_DECIMALS['ETH'], 'currency': 'ETH'},
-    {'contract_type': 8, 'contract_name': 'AirDrop', 'price': CONTRACT_PRICE_ETH['AIRDROP'] * NET_DECIMALS['ETH'], 'currency': 'ETH'},
-    {'contract_type': 9, 'contract_name': 'InvestmentPool', 'price': CONTRACT_PRICE_ETH['INVESTMENT_POOL'] * NET_DECIMALS['ETH'], 'currency': 'ETH'},
+    {'contract_type': 0, 'contract_name': 'LastWill', 'price': 0.257 * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 1, 'contract_name': 'LostKey', 'price': 0.2 * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 2, 'contract_name': 'DefferedPayment', 'price': 0.025 * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 4, 'contract_name': 'ICO', 'price': CONTRACT_PRICE_DUC['ICO'] * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 5, 'contract_name': 'Token', 'price': CONTRACT_PRICE_DUC['TOKEN'] * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 8, 'contract_name': 'AirDrop', 'price': CONTRACT_PRICE_DUC['AIRDROP'] * NET_DECIMALS['DUC'], 'currency': 'DUC'},
+    {'contract_type': 9, 'contract_name': 'InvestmentPool', 'price': CONTRACT_PRICE_DUC['INVESTMENT_POOL'] * NET_DECIMALS['DUC'], 'currency': 'DUC'},
 ]
 
 ETHPLORER_URL = 'http://api.ethplorer.io/getAddressInfo/{address}?apiKey={key}'
