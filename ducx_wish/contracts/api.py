@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.views.generic import View
 
 from rest_framework import status
@@ -12,7 +12,7 @@ from rest_framework.exceptions import PermissionDenied
 from collections import OrderedDict
 
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS
-from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_URL, TOKEN_PROTECTOR_URL
+from ducx_wish.settings import DUCATUSX_URL
 from ducx_wish.permissions import IsOwner, IsStaff
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
     ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
@@ -20,29 +20,13 @@ from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
 from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message
-from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer, deploy_swaps, deploy_protector, ContractDetailsTokenSerializer
+from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer
 from ducx_wish.consts import *
 import requests
 from django.db.models import Q
 
 BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/20100101 Firefox/69.0'}
 
-
-
-def sendEMail(sub, text, mail):
-    server = smtplib.SMTP('smtp.yandex.ru',587)
-    server.starttls()
-    server.ehlo()
-    server.login(EMAIL_HOST_USER_SWAPS, EMAIL_HOST_PASSWORD_SWAPS)
-    message = "\r\n".join([
-        "From: {address}".format(address=EMAIL_HOST_USER_SWAPS),
-        "To: {to}".format(to=mail),
-        "Subject: {sub}".format(sub=sub),
-        "",
-        str(text)
-    ])
-    server.sendmail(EMAIL_HOST_USER_SWAPS, mail, message)
-    server.quit()
 
 
 class ContractViewSet(ModelViewSet):
@@ -64,11 +48,9 @@ class ContractViewSet(ModelViewSet):
         result = self.queryset.order_by('-created_date')
         host = self.request.META['HTTP_HOST']
         print('host is', host, flush=True)
-        if host == MY_WISH_URL:
+        if host == DUCATUSX_URL:
             result = result.exclude(contract_type__in=[20, 21, 22, 23])
             # result = result.exclude(contract_type__in=[20, 21, 22])
-        if host == TRON_URL:
-            result = result.exclude(contract_type__in=[20, 21])
         if self.request.user.is_staff:
             return result
         return result.filter(user=self.request.user)
@@ -941,7 +923,7 @@ def buy_brand_report(request):
         raise PermissionDenied
     if contract.contract_type != 5:
         raise PermissionDenied
-    if contract.network.name != 'ETHEREUM_MAINNET':
+    if contract.network.name != 'DUCATUSX_MAINNET':
         raise PermissionDenied
     details = contract.get_details()
     cost = 450 * NET_DECIMALS['DUC']
@@ -998,7 +980,7 @@ def get_tokens_for_eth_address(request):
                 result = []
     else:
         contracts = Contract.objects.filter(
-            user=request.user, contract_type=5, network__name='ETHEREUM_ROPSTEN', state__in=('ACTIVE', 'ENDED', 'DONE')
+            user=request.user, contract_type=5, network__name='DUCATUSX_TESTNET', state__in=('ACTIVE', 'ENDED', 'DONE')
         )
         result = []
         for contract in contracts:

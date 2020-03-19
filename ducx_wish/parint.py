@@ -34,7 +34,7 @@ class ParInt:
             if len(sys.argv) > 1 and sys.argv[1] in NETWORKS:
                 network = sys.argv[1]
             else:
-                network = 'ETHEREUM_MAINNET'
+                network = 'DUCATUSX_MAINNET'
         print('network', network, type(network))
         self.addr = NETWORKS[network]['host']
         self.port = NETWORKS[network]['port']
@@ -83,7 +83,7 @@ class InfuraInt:
             if len(sys.argv) > 1 and sys.argv[1] in NETWORKS:
                 network = sys.argv[1]
             else:
-                network = 'ETHEREUM_MAINNET'
+                network = 'DUCATUSX_MAINNET'
         self.infura_subdomain = NETWORKS[network]['infura_subdomain']
         self.infura_project_id = NETWORKS[network]['infura_project_id']
 

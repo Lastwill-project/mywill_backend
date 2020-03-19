@@ -34,11 +34,8 @@ from ducx_wish.contracts.api import (ContractViewSet, get_code, test_comp,
                                      get_invest_balance_day, check_status,
                                      get_eos_cost, get_eos_airdrop_cost,
                                      check_eos_accounts_exists, buy_brand_report, get_authio_cost,
-                                     get_testnet_tron_tokens, get_tokens_for_eth_address,
-                                     get_tronish_balance, confirm_swaps_info, confirm_protector_info,
-                                     get_contract_for_unique_link, get_public_contracts,
-                                     change_contract_state, send_message_author_swap, confirm_protector_tokens,
-                                     get_test_tokens, skip_protector_approve)
+                                     get_testnet_tron_tokens, get_tokens_for_eth_address
+                                     )
 from ducx_wish.contracts.api_common import get_contract_price, get_contracts, get_available_contracts
 from ducx_wish.other.api import SentenceViewSet, send_unblocking_info
 from ducx_wish.social.views import FacebookLogin, GoogleLogin, MetamaskLogin, FacebookAuth
@@ -108,16 +105,6 @@ urlpatterns = [
     url(r'^api/get_available_contracts/$', get_available_contracts),
     url(r'^api/get_testnet_tron_tokens/$', get_testnet_tron_tokens),
     url(r'^api/get_tokens_for_eth_address/$', get_tokens_for_eth_address),
-    url(r'^api/get_tronish_balance/$', get_tronish_balance),
-    url(r'^api/confirm_swaps_info/$', confirm_swaps_info),
-    url(r'^api/confirm_protector_info/$', confirm_protector_info),
-    url(r'^api/confirm_protector_tokens/$', confirm_protector_tokens),
-    url(r'^api/skip_protector_approve/$', skip_protector_approve),
-    url(r'^api/get_test_tokens/$', get_test_tokens),
-    url(r'^api/get_contract_for_unique_link/$', get_contract_for_unique_link),
-    url(r'^api/get_public_contracts/$', get_public_contracts),
-    url(r'^api/change_contract_state/$', change_contract_state),
-    url(r'^api/send_message_author_swap/$', send_message_author_swap),
     url(r'^contribute', redirect_contribute),
 ]
 

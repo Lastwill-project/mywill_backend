@@ -213,7 +213,7 @@ class ContractDetailsLastwillSerializer(serializers.ModelSerializer):
             btc_key = contract_details.btc_key
             if btc_key:
                 res['btc_address'] = contract_details.btc_key.btc_address
-        if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
+        if contract_details.contract.network.name in ['DUCATUSX_TESTNET', 'RSK_TESTNET']:
             res['ducx_contract']['source_code'] = ''
         return res
 
@@ -290,7 +290,7 @@ class ContractDetailsDelayedPaymentSerializer(serializers.ModelSerializer):
     def to_representation(self, contract_details):
         res = super().to_representation(contract_details)
         res['ducx_contract'] = DUCXContractSerializer().to_representation(contract_details.ducx_contract)
-        if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
+        if contract_details.contract.network.name in ['DUCATUSX_TESTNET', 'RSK_TESTNET']:
             res['ducx_contract']['source_code'] = ''
         return res
 
@@ -419,7 +419,7 @@ class ContractDetailsICOSerializer(serializers.ModelSerializer):
         res['ducx_contract_crowdsale'] = DUCXContractSerializer().to_representation(
             contract_details.ducx_contract_crowdsale)
         res['rate'] = int(res['rate'])
-        if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
+        if contract_details.contract.network.name in ['DUCATUSX_TESTNET', 'RSK_TESTNET']:
             res['ducx_contract_token']['source_code'] = ''
             res['ducx_contract_crowdsale']['source_code'] = ''
         return res
@@ -504,7 +504,7 @@ class ContractDetailsTokenSerializer(serializers.ModelSerializer):
                 contract__state='ACTIVE'):
             res['crowdsale'] = contract_details.ducx_contract_token.ico_details_token.filter(
                 contract__state__in=('ACTIVE', 'ENDED')).order_by('id')[0].contract.id
-        if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
+        if contract_details.contract.network.name in ['DUCATUSX_TESTNET', 'RSK_TESTNET']:
             res['ducx_contract_token']['source_code'] = ''
         return res
 
@@ -642,7 +642,7 @@ class ContractDetailsInvestmentPoolSerializer(serializers.ModelSerializer):
     def to_representation(self, contract_details):
         res = super().to_representation(contract_details)
         res['ducx_contract'] = DUCXContractSerializer().to_representation(contract_details.ducx_contract)
-        if contract_details.contract.network.name in ['ETHEREUM_ROPSTEN', 'RSK_TESTNET']:
+        if contract_details.contract.network.name in ['DUCATUSX_TESTNET', 'RSK_TESTNET']:
             res['ducx_contract']['source_code'] = ''
         if contract_details.contract.state not in ('ACTIVE', 'CANCELLED', 'DONE', 'ENDED'):
             res.pop('link', '')

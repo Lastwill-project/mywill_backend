@@ -87,12 +87,12 @@ class ContractDetailsLastwill(CommonDetails):
             [h.percentage for h in self.contract.heir_set.all()],
             self.check_interval,
             False if self.contract.network.name in
-                     ['ETHEREUM_MAINNET', 'ETHEREUM_ROPSTEN'] else True,
+                     ['DUCATUSX_MAINNET', 'DUCATUSX_TESTNET'] else True,
         ]
 
     @classmethod
     def min_cost(cls):
-        network = Network.objects.get(name='ETHEREUM_MAINNET')
+        network = Network.objects.get(name='DUCATUSX_MAINNET')
         now = datetime.datetime.now()
         cost = cls.calc_cost({
             'check_interval': 1,
@@ -105,32 +105,6 @@ class ContractDetailsLastwill(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        heirs_num = int(kwargs['heirs_num']) if 'heirs_num' in kwargs else len(kwargs['heirs'])
-        active_to = kwargs['active_to']
-        if isinstance(active_to, str):
-            if 'T' in active_to:
-                active_to = active_to[:active_to.index('T')]
-            active_to = datetime.date(*map(int, active_to.split('-')))
-        elif isinstance(active_to, datetime.datetime):
-            active_to = active_to.date()
-        check_interval = int(kwargs['check_interval'])
-        Cg = 780476
-        CBg = 26561
-        Tg = 22000
-        Gp = 60 * NET_DECIMALS['ETH_GAS_PRICE']
-        Dg = 29435
-        DBg = 9646
-        B = heirs_num
-        Cc = 124852
-        DxC = max(abs(
-            (datetime.date.today() - active_to).total_seconds() / check_interval
-        ), 1)
-        O = 25000 * NET_DECIMALS['ETH_GAS_PRICE']
-        result = 2 * int(
-            Tg * Gp + Gp * (Cg + B * CBg) + Gp * (Dg + DBg * B) + (Gp * Cc + O) * DxC
-        ) + 80000
-        if network.name == 'RSK_MAINNET':
-            result += 2 * NET_DECIMALS['ETH']
         return 30 * NET_DECIMALS['DUC']
 
     @postponable
