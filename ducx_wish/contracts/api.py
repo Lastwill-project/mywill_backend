@@ -7,12 +7,15 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied
 from collections import OrderedDict
 
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS
 from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_SUPPORT_MAIL, WAVES_URL, TOKEN_PROTECTOR_URL
 from ducx_wish.permissions import IsOwner, IsStaff
 from ducx_wish.snapshot.models import *
+from ducx_wish.promo.models import Promo
 from ducx_wish.promo.api import check_and_get_discount
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
     ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
@@ -20,7 +23,7 @@ from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
 from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message
-from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer, EOSAirdropAddressSerializer, deploy_swaps, deploy_protector, ContractDetailsTokenSerializer
+from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer, deploy_swaps, deploy_protector, ContractDetailsTokenSerializer
 from ducx_wish.consts import *
 import requests
 from django.db.models import Q
@@ -764,27 +767,6 @@ class WhitelistAddressViewSet(viewsets.ModelViewSet):
 class AirdropAddressViewSet(viewsets.ModelViewSet):
     queryset = AirdropAddress.objects.all()
     serializer_class = AirdropAddressSerializer
-    permission_classes = (ReadOnly,)
-
-    def get_queryset(self):
-        result = self.queryset
-        contract_id = self.request.query_params.get('contract', None)
-        if not contract_id:
-            raise ValidationError()
-        contract = Contract.objects.get(id=contract_id)
-        if contract.user != self.request.user:
-            raise ValidationError({'result': 2}, code=403)
-        result = result.filter(contract=contract, active=True)
-        state = self.request.query_params.get('state', None)
-        if state:
-            result = result.filter(state=state)
-        result = result.order_by('id')
-        return result
-
-
-class EOSAirdropAddressViewSet(viewsets.ModelViewSet):
-    queryset = EOSAirdropAddress.objects.all()
-    serializer_class = EOSAirdropAddressSerializer
     permission_classes = (ReadOnly,)
 
     def get_queryset(self):

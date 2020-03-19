@@ -321,20 +321,7 @@ class Contract(models.Model):
         neo_ico = apps.get_model('contracts', 'ContractDetailsNeoICO')
         airdrop = apps.get_model('contracts', 'ContractDetailsAirdrop')
         investment = apps.get_model('contracts', 'ContractDetailsInvestmentPool')
-        eos_token = apps.get_model('contracts', 'ContractDetailsEOSToken')
-        eos_account = apps.get_model('contracts', 'ContractDetailsEOSAccount')
-        eos_ico = apps.get_model('contracts', 'ContractDetailsEOSICO')
-        eos_airdrop = apps.get_model('contracts', 'ContractDetailsEOSAirdrop')
-        eos_token_standalone = apps.get_model('contracts', 'ContractDetailsEOSTokenSA')
-        tron_token = apps.get_model('contracts', 'ContractDetailsTRONToken')
-        game_asset = apps.get_model('contracts', 'ContractDetailsGameAssets')
-        tron_airdrop = apps.get_model('contracts', 'ContractDetailsTRONAirdrop')
-        tron_lostkey = apps.get_model('contracts', 'ContractDetailsTRONLostkey')
-        eth_lostkey_tokens = apps.get_model('contracts', 'ContractDetailsLostKeyTokens')
-        swap = apps.get_model('contracts', 'ContractDetailsSWAPS')
-        waves = apps.get_model('contracts', 'ContractDetailsWavesSTO')
-        swap2 = apps.get_model('contracts', 'ContractDetailsSWAPS2')
-        token_protector = apps.get_model('contracts', 'ContractDetailsTokenProtector')
+
 
         contract_details_types[0] = {'name': 'Will contract', 'model': lastwill}
         contract_details_types[1] = {'name': 'Wallet contract (lost key)',
@@ -347,20 +334,6 @@ class Contract(models.Model):
         contract_details_types[7] = {'name': 'MyWish NEO ICO', 'model': neo_ico}
         contract_details_types[8] = {'name': 'Airdrop', 'model': airdrop}
         contract_details_types[9] = {'name': 'InvestmentPool', 'model': investment}
-        contract_details_types[10] = {'name': 'EOS Token', 'model': eos_token}
-        contract_details_types[11] = {'name': 'EOS Account', 'model': eos_account}
-        contract_details_types[12] = {'name': 'EOS ICO', 'model': eos_ico}
-        contract_details_types[13] = {'name': 'EOS Airdrop', 'model': eos_airdrop}
-        contract_details_types[14] = {'name': 'EOS Token standalone', 'model': eos_token_standalone}
-        contract_details_types[15] = {'name': 'TRON Token', 'model': tron_token}
-        contract_details_types[16] = {'name': 'Game Assets', 'model': game_asset}
-        contract_details_types[17] = {'name': 'TRON Airdrop', 'model': tron_airdrop}
-        contract_details_types[18] = {'name': 'TRON LostKey', 'model': tron_lostkey}
-        contract_details_types[19] = {'name': 'ETH LostKey with tokens', 'model': eth_lostkey_tokens}
-        contract_details_types[20] = {'name': 'SWAPS Contract', 'model': swap}
-        contract_details_types[22] = {'name': 'WAVES Contract STO', 'model': waves}
-        contract_details_types[21] = {'name': 'SWAPS Contract', 'model': swap2}
-        contract_details_types[23] = {'name': 'Token protector contract', 'model': token_protector}
 
         return contract_details_types
 

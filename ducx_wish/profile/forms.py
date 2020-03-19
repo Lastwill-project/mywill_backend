@@ -6,7 +6,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from ducx_wish.settings import MY_WISH_URL, SWAPS_URL, EMAIL_HOST_USER, EMAIL_HOST_USER_SWAPS
-from ducx_wish.contracts.submodels.swaps import sendEMail
 from email_messages import password_reset_subject, password_reset_text
 
 

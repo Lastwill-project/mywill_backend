@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 
-from ducx_wish.contracts.api_eos import *
 from ducx_wish.consts import *
 
 
