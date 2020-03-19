@@ -100,9 +100,9 @@ WSGI_APPLICATION = 'ducx_wish.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lastwill_new',
-        'USER': 'lastwill_new',
-        'PASSWORD': 'lastwill_new',
+        'NAME': 'ducxwill_new',
+        'USER': 'ducxwill_new',
+        'PASSWORD': 'ducxwill_new',
         'HOST': 'localhost',
         'PORT': 5432,
         'CONN_MAX_AGE': None
