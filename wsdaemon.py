@@ -94,7 +94,7 @@ def read(queue_object, proto_dict):
 
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
-    factory = WebSocketServerFactory("ws://127.0.0.1:8077")
+    factory = WebSocketServerFactory("ws://127.0.0.1:8078")
     factory.protocol = WSP 
     factory.setProtocolOptions(maxConnections=10000)
     factory.connections_dict = {}
