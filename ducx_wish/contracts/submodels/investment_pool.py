@@ -115,7 +115,7 @@ class ContractDetailsInvestmentPool(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        return 50 * NET_DECIMALS['USDT']
+        return 50 * NET_DECIMALS['DUC']
 
     @classmethod
     def min_cost(cls):

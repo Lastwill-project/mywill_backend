@@ -146,7 +146,7 @@ def deploy(request):
         raise PermissionDenied
 
     cost = contract.cost
-    currency = 'USDT'
+    currency = 'DUC'
     site_id = 1
     network = contract.network.name
     create_payment(request.user.id, '', currency, -cost, site_id, network)
@@ -663,10 +663,7 @@ def get_cost_all_contracts(request):
     contract_details_types = Contract.get_all_details_model()
     for i in contract_details_types:
         answer[i] ={
-            'USDT': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDT']),
-            'WISH': str(int(
-                contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDT']
-            ) * convert('USDT', 'WISH')['WISH'])
+            'DUC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['DUC']),
         }
     return JsonResponse(answer)
 
@@ -956,8 +953,8 @@ def buy_brand_report(request):
     if contract.network.name != 'ETHEREUM_MAINNET':
         raise PermissionDenied
     details = contract.get_details()
-    cost = 450 * NET_DECIMALS['USDT']
-    currency = 'USDT'
+    cost = 450 * NET_DECIMALS['DUC']
+    currency = 'DUC'
     site_id = 1
     net = contract.network.name
     create_payment(request.user.id, '', currency, -cost, site_id, net)
@@ -973,11 +970,8 @@ def buy_brand_report(request):
 
 @api_view(http_method_names=['GET'])
 def get_authio_cost(request):
-    usdt_cost = str(450 * NET_DECIMALS['USDT'])
-    eth_cost = str(int(usdt_cost) * convert('USDT', 'ETH')['ETH'] / NET_DECIMALS['USDT'] * NET_DECIMALS['ETH'])
-    wish_cost = str(int(usdt_cost) * convert('USDT', 'WISH')['WISH'] / NET_DECIMALS['USDT'] * NET_DECIMALS['WISH'])
-    btc_cost = str(int(usdt_cost) * convert('USDT', 'BTC')['BTC'] / NET_DECIMALS['USDT'] * NET_DECIMALS['BTC'])
-    return JsonResponse({'USDT': usdt_cost, 'ETH': eth_cost, 'WISH': wish_cost, 'BTC': btc_cost})
+    duc_cost = str(450 * NET_DECIMALS['DUC'])
+    return JsonResponse({'DUC': duc_cost })
 
 
 @api_view(http_method_names=['GET'])
@@ -1034,256 +1028,3 @@ def get_tokens_for_eth_address(request):
     return Response(result)
 
 
-@api_view(http_method_names=['GET'])
-def get_tronish_balance(request):
-    eos_address = request.query_params.get('eos_address', None)
-    if eos_address:
-        tronish_info = TRONSnapshotEOS.objects.filter(eos_address=eos_address).first()
-        if tronish_info:
-            return Response({
-                'balance': tronish_info.balance / 10 ** 4 / 20 * 10 ** 6
-            })
-
-    eth_address = request.query_params.get('eth_address', None)
-    if eth_address:
-        tronish_info = TRONSnapshotEth.objects.filter(
-            eth_address=eth_address).first()
-        if tronish_info:
-            return Response({
-                'balance': tronish_info.balance / 10 ** 18 * 10 ** 6
-            })
-    tron_address = request.query_params.get('tron_address', None)
-    if tron_address:
-        tronish_info = TRONSnapshotTRON.objects.filter(
-            tron_address=tron_address).first()
-        if tronish_info:
-            return Response({
-                'balance': tronish_info.balance / 10000
-            })
-    return Response({'balance': 0})
-
-
-
-def autodeploing(user_id, subsite_id):
-    bb = UserSiteBalance.objects.get(subsite__id=subsite_id, user__id=user_id)
-    if subsite_id == 4:
-        contract_type = 20
-        contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type,
-                                            network__name='ETHEREUM_MAINNET', state='WAITING_FOR_PAYMENT').order_by(
-            '-created_date')
-    else:
-        # subsite_id == 5:
-        contract_type = 23
-        contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type,
-                                            state='WAITING_FOR_PAYMENT').order_by('-created_date')
-    # contracts = Contract.objects.filter(user__id=user_id, contract_type=contract_type, network__name='ETHEREUM_MAINNET', state='WAITING_FOR_PAYMENT').order_by('-created_date')
-    for contract in contracts:
-        print('check5', flush=True)
-        contract_details = contract.get_details()
-        contract_details.predeploy_validate()
-        kwargs = ContractSerializer().get_details_serializer(
-            contract.contract_type
-        )().to_representation(contract_details)
-        cost = contract_details.calc_cost_usdt(kwargs, contract.network)
-        if bb.balance >= cost or bb.balance >= cost * 0.95:
-            if subsite_id == 4:
-                deploy_swaps(contract.id)
-            if subsite_id == 5:
-                deploy_protector(contract.id)
-        bb.refresh_from_db()
-        if subsite_id == 5:
-            break
-        print('check3', flush=True)
-    print('check4', flush=True)
-    return True
-
-
-@api_view(http_method_names=['POST'])
-def confirm_swaps_info(request):
-    contract = Contract.objects.get(id=int(request.data.get('contract_id')))
-    host = request.META['HTTP_HOST']
-    if contract.user != request.user or contract.state != 'CREATED':
-        raise PermissionDenied
-    if contract.contract_type != 20:
-        raise PermissionDenied
-    if contract.network.name != 'ETHEREUM_MAINNET':
-        raise PermissionDenied
-    if host != SWAPS_URL:
-        raise PermissionDenied
-    confirm_contracts = Contract.objects.filter(user=request.user, state='WAITING_FOR_PAYMENT', contract_type=20)
-    for c in confirm_contracts:
-        c.state = 'WAITING_FOR_PAYMENT'
-        c.save()
-    contract.state = 'WAITING_FOR_PAYMENT'
-    contract.save()
-    autodeploing(contract.user.id, 4)
-    return JsonResponse(ContractSerializer().to_representation(contract))
-
-@api_view(http_method_names=['POST'])
-def confirm_protector_info(request):
-    print('protector confirm', flush=True)
-    contract = Contract.objects.get(id=int(request.data.get('contract_id')))
-    print(contract.__dict__, flush=True)
-    host = request.META['HTTP_HOST']
-    print('host', host, flush=True)
-    if contract.user != request.user or contract.state != 'CREATED':
-        print(1, flush=True)
-        raise PermissionDenied
-    print('contract_type', contract.contract_type, flush=True)
-    if contract.contract_type != 23:
-        print(2, flush=True)
-        raise PermissionDenied
-    if contract.network.name not in ['ETHEREUM_MAINNET', 'ETHEREUM_ROPSTEN']:
-        print(2.5, flush=True)
-        raise PermissionDenied
-    if host != TOKEN_PROTECTOR_URL:
-        print(3, flush=True)
-        raise PermissionDenied
-    print(4, flush=True)
-    # confirm_contracts = Contract.objects.filter(user=request.user, state='WAITING_FOR_PAYMENT', contract_type=23)
-    # for c in confirm_contracts:
-    #     c.state = 'WAITING_FOR_PAYMENT'
-    #     c.save()
-    if contract.network.name == 'ETHEREUM_MAINNET':
-        contract.state = 'WAITING_FOR_PAYMENT'
-        contract.save()
-        autodeploing(contract.user.id, 5)
-    elif contract.network.name == 'ETHEREUM_ROPSTEN':
-        contract.state = 'WAITING_FOR_DEPLOYMENT'
-        contract.save()
-        contract_details = contract.get_details()
-        contract_details.predeploy_validate()
-        queue = NETWORKS[contract.network.name]['queue']
-        print('skip payment', flush=True)
-        send_in_queue(contract.id, 'launch', queue)
-    print('protector confirm ok', flush=True)
-    return JsonResponse(ContractSerializer().to_representation(contract))
-
-
-@api_view(http_method_names=['POST'])
-def confirm_protector_tokens(request):
-    print('data', request.data, flush=True)
-    print('data type', type(request.data), flush=True)
-    contract = Contract.objects.filter(id=int(request.data.get('contract_id')), user=request.user, contract_type=23).first()
-    if contract:
-        token_list = request.data.get('tokens')
-        protector_contract = ContractDetailsTokenProtector.objects.get(contract=contract)
-        protector_contract.approve_from_front(token_list)
-        # protector_contract.confirm_tokens()
-
-        return JsonResponse(ContractSerializer().to_representation(contract))
-
-    raise PermissionDenied
-
-
-@api_view(http_method_names=['POST'])
-def skip_protector_approve(request):
-    contract = Contract.objects.filter(id=int(request.data.get('contract_id')), user=request.user,
-                                       contract_type=23, state='WAITING_FOR_APPROVE').first()
-    if contract:
-        contract.state = 'ACTIVE'
-        contract.save()
-
-        return JsonResponse(ContractSerializer().to_representation(contract))
-
-    raise PermissionDenied
-
-
-@api_view(http_method_names=['GET'])
-def get_test_tokens(request):
-    tokens_serializer = ContractDetailsTokenSerializer(ContractDetailsToken.objects.filter(~Q(ducx_contract_token = None)), many=True)
-    for token in tokens_serializer.data:
-        token['platform'] = 'ethereum'
-        token.pop('admin_address')
-        token.pop('decimals')
-        token.pop('token_type')
-        token.pop('future_minting')
-        token.pop('authio')
-        token.pop('authio_email')
-        token.pop('authio_date_payment')
-        token.pop('authio_date_getting')
-        token.pop('token_holders')
-        token['address'] = token['ducx_contract_token']['address']
-        token.pop('ducx_contract_token')
-
-    token_list = tokens_serializer.data
-    # print('type', type(token_list), flush=True)
-    # print(token_list, flush=True)
-
-    # token_list.append(OrderedDict({
-    #     'token_name': 'OMST',
-    #     'token_short_name': 'OMST',
-    #     'platform': 'ethereum',
-    #     'address': '0xa0379b1ac68027a76373adc7800d87eb5c3fac5e'
-    # }))
-    #
-    # token_list.append(OrderedDict({
-    #     'token_name': 'DAPS',
-    #     'token_short_name': 'DAPS',
-    #     'platform': 'ethereum',
-    #     'address': '0x16e00ca19a4025405a4d9a1ceb92c945583d7c0d'
-    # }))
-
-    return Response(token_list)
-
-
-@api_view(http_method_names=['GET'])
-def get_contract_for_unique_link(request):
-    link = request.query_params.get('unique_link', None)
-    if not link:
-        raise PermissionDenied
-    details = ContractDetailsSWAPS.objects.filter(unique_link=link).first()
-    if not details:
-        details = ContractDetailsSWAPS2.objects.filter(unique_link=link).first()
-    if not details:
-        raise PermissionDenied
-    contract = details.contract
-    return JsonResponse(ContractSerializer().to_representation(contract))
-
-
-@api_view(http_method_names=['GET'])
-def get_public_contracts(request):
-    contracts = Contract.objects.filter(contract_type__in=[20, 21], network__name='ETHEREUM_MAINNET', state='ACTIVE')
-    result = []
-    for contract in contracts:
-        d = contract.get_details()
-        if d.public:
-            result.append(ContractSerializer().to_representation(contract))
-
-    return JsonResponse(result, safe=False)
-
-
-@api_view(http_method_names=['POST'])
-def change_contract_state(request):
-    contract = Contract.objects.get(id=int(request.data.get('contract_id')))
-    host = request.META['HTTP_HOST']
-    if contract.user != request.user or contract.state != 'CREATED':
-        raise PermissionDenied
-    if contract.contract_type != 21:
-        raise PermissionDenied
-    if contract.network.name != 'ETHEREUM_MAINNET':
-        raise PermissionDenied
-    if host != SWAPS_URL:
-        raise PermissionDenied
-    contract.state = 'WAITING_FOR_ACTIVATION'
-    contract.save()
-    return JsonResponse(ContractSerializer().to_representation(contract))
-
-
-@api_view(http_method_names=['POST'])
-def send_message_author_swap(request):
-    contract_id = int(request.data.get('contract_id'))
-    link = request.data.get('link')
-    email = request.data.get('email')
-    message = request.data.get('message')
-    sendEMail(
-        swaps_support_subject,
-        swaps_support_message.format(
-            id=contract_id,
-            email=email,
-            link=link,
-            msg=message.encode('utf-8')
-        ),
-        [SWAPS_SUPPORT_MAIL]
-    )
-    return Response('ok')

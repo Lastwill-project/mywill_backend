@@ -34,7 +34,7 @@ class ContractDetailsDelayedPayment(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        return 30 * NET_DECIMALS['USDT']
+        return 30 * NET_DECIMALS['DUC']
 
     def fundsAdded(self, message):
         pass

@@ -85,19 +85,8 @@ CONTRACT_GAS_LIMIT = {
 }
 
 NET_DECIMALS = {
-    'ETH': 10 ** 18,
-    'ETH_GAS_PRICE': 10 ** 9,
-    'EOS': 10 ** 4,
-    'WISH': 10 ** 18,
-    'EOSISH': 10 ** 4,
-    'BNB': 10 ** 18,
-    'BWISH': 10 ** 18,
-    'BTC': 10 ** 8,
-    'TRON': 10 ** 6,
-    'TRONISH': 10 ** 6,
-    'TRX': 10 ** 6,
-    'USDT': 10 ** 6,
-    'SWAP': 10 ** 18
+    'DUC': 10 ** 8,
+    'DUCX': 10 ** 18
 }
 
 TRON_REPLENISH_THRESHOLD = {

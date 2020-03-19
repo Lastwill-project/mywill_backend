@@ -48,66 +48,6 @@ def count_sold_tokens(address):
     return sold_tokens
 
 
-def sendEMail(sub, text, mail):
-    server = smtplib.SMTP('smtp.yandex.ru', 587)
-    server.starttls()
-    server.ehlo()
-    server.login(EMAIL_HOST_USER_SWAPS, EMAIL_HOST_PASSWORD_SWAPS)
-    message = "\r\n".join([
-        "From: {address}".format(address=EMAIL_HOST_USER_SWAPS),
-        "To: {to}".format(to=mail),
-        "Subject: {sub}".format(sub=sub),
-        "",
-        str(text)
-    ])
-    server.sendmail(EMAIL_HOST_USER_SWAPS, mail, message)
-    server.quit()
-
-
-def deploy_swaps(contract_id):
-    contract = Contract.objects.get(id=contract_id)
-    if contract.state == 'WAITING_FOR_PAYMENT':
-        contract_details = contract.get_details()
-        contract_details.predeploy_validate()
-        kwargs = ContractSerializer().get_details_serializer(
-            contract.contract_type
-        )().to_representation(contract_details)
-        cost = contract_details.calc_cost_usdt(kwargs, contract.network)
-        site_id = 4
-        currency = 'USDT'
-        user_info = UserSiteBalance.objects.get(user=contract.user, subsite__id=4)
-        if user_info.balance >= cost or int(user_info.balance) >= cost * 0.95:
-            create_payment(contract.user.id, '', currency, -cost, site_id, 'ETHEREUM_MAINNET')
-            contract.state = 'WAITING_FOR_DEPLOYMENT'
-            contract.save()
-            queue = NETWORKS[contract.network.name]['queue']
-            send_in_queue(contract.id, 'launch', queue)
-    return True
-
-
-def deploy_protector(contract_id):
-    contract = Contract.objects.get(id=contract_id)
-    if contract.state == 'WAITING_FOR_PAYMENT':
-        contract_details = contract.get_details()
-        contract_details.predeploy_validate()
-        kwargs = ContractSerializer().get_details_serializer(
-            contract.contract_type
-        )().to_representation(contract_details)
-        cost = contract_details.calc_cost(kwargs, contract.network)
-        site_id = 5
-        currency = 'USDT'
-        user_info = UserSiteBalance.objects.get(user=contract.user, subsite__id=5)
-        if user_info.balance >= cost or int(user_info.balance) >= cost * 0.95:
-            create_payment(contract.user.id, '', currency, -cost, site_id, 'ETHEREUM_MAINNET')
-            contract.state = 'WAITING_FOR_DEPLOYMENT'
-            contract.save()
-            queue = NETWORKS[contract.network.name]['queue']
-            print('check1', flush=True)
-            send_in_queue(contract.id, 'launch', queue)
-        print('check2', flush=True)
-    return True
-
-
 class HeirSerializer(serializers.ModelSerializer):
     class Meta:
         model = Heir
@@ -118,8 +58,6 @@ class TokenHolderSerializer(serializers.ModelSerializer):
     class Meta:
         model = TokenHolder
         fields = ('address', 'amount', 'freeze_date', 'name')
-
-
 
 
 class ContractSerializer(serializers.ModelSerializer):
@@ -178,29 +116,6 @@ class ContractSerializer(serializers.ModelSerializer):
                     DEFAULT_FROM_EMAIL,
                     [validated_data['user'].email]
                 )
-            elif contract.contract_type in (20, 21):
-                sendEMail(
-                    email_messages.swaps_subject,
-                    email_messages.swaps_message,
-                    validated_data['user'].email
-                )
-            elif contract.contract_type == 23:
-                email = contract_details['email'] if contract_details['email'] else validated_data['user'].email
-                send_mail(
-                    email_messages.protector_create_subject,
-                    email_messages.protector_create_text,
-                    DEFAULT_FROM_EMAIL,
-                    [email]
-                )
-            else:
-                send_mail(
-                    email_messages.eos_create_subject,
-                    email_messages.eos_create_message.format(
-                        network_name=network_name
-                    ),
-                    DEFAULT_FROM_EMAIL,
-                    [validated_data['user'].email]
-                )
         return contract
 
     def to_representation(self, contract):
@@ -209,66 +124,17 @@ class ContractSerializer(serializers.ModelSerializer):
             contract.contract_type
         )(context=self.context).to_representation(contract.get_details())
         if contract.state != 'CREATED':
-            usdt_cost = res['cost']
+            duc_cost = res['cost']
             if 'TESTNET' in contract.network.name or 'ROPSTEN' in contract.network.name:
-                usdt_cost = 0
+                duc_cost = 0
         else:
-            usdt_cost = Contract.get_details_model(
+            duc_cost = Contract.get_details_model(
                 contract.contract_type
             ).calc_cost(res['contract_details'], contract.network)
-        usdt_cost = int(usdt_cost)
+        duc_cost = int(duc_cost)
         res['cost'] = {
-            'USDT': str(usdt_cost),
-            'ETH': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'ETH')['ETH'] * 10 ** 18)),
-            'WISH': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'WISH')['WISH'] * 10 ** 18)),
-            'BTC': str(int(round((int(usdt_cost) / 10 ** 6 * convert('USDT', 'BTC')['BTC'] * 10 ** 8), 0))),
-            'EOS': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'EOS')['EOS'] * 10 ** 4)),
-            'TRON': str(int(round((int(usdt_cost) * convert('USDT', 'TRX')['TRX']), 0))),
+            'DUC': str(duc_cost),
         }
-        if contract.network.name == 'EOS_MAINNET':
-            res['cost']['EOS'] = str(Contract.get_details_model(
-                contract.contract_type
-            ).calc_cost_eos(res['contract_details'], contract.network))
-            res['cost']['EOSISH'] = str(float(
-                res['cost']['EOS']
-            ) * convert('EOS', 'EOSISH')['EOSISH'])
-        if contract.network.name == 'EOS_TESTNET':
-            res['cost']['EOS'] = 0
-            res['cost']['EOSISH'] = 0
-        if contract.network.name == 'TRON_MAINNET':
-            res['cost']['TRX'] = str(Contract.get_details_model(
-                contract.contract_type
-            ).calc_cost_tron(res['contract_details'], contract.network))
-            res['cost']['TRONISH'] = res['cost']['TRX']
-        if contract.network.name == 'TRON_TESTNET':
-            res['cost']['TRX'] = 0
-            res['cost']['TRONISH'] = 0
-        if contract.contract_type == 20:
-            cost = Contract.get_details_model(
-                contract.contract_type
-            ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
-            res['cost'] = {
-                'USDT': str(int(cost * NET_DECIMALS['USDT'])),
-                'ETH': str(int(cost) * convert('USDT', 'ETH')['ETH'] * NET_DECIMALS['ETH']),
-                'WISH': str(int(cost) * convert('USDT', 'WISH')['WISH'] * NET_DECIMALS['WISH']),
-                'BTC': str(int(cost) * convert('USDT', 'BTC')['BTC'] * NET_DECIMALS['BTC']),
-                'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
-                'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP'])
-            }
-        elif contract.contract_type == 23:
-            cost = Contract.get_details_model(
-                contract.contract_type
-            ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
-            res['cost'] = {
-                'USDT': str(int(cost * NET_DECIMALS['USDT'])),
-                'ETH': str(int(cost) * convert('USDT', 'ETH')['ETH'] * NET_DECIMALS['ETH']),
-                'WISH': str(int(cost) * convert('USDT', 'BNB')['BNB'] * bnb_to_wish() * NET_DECIMALS['WISH']),
-                'BTC': str(int(cost) * convert('USDT', 'BTC')['BTC'] * NET_DECIMALS['BTC']),
-                'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
-                'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP'])
-            }
-
-
         return res
 
     def update(self, contract, validated_data):

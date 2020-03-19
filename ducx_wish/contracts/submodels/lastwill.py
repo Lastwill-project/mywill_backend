@@ -131,7 +131,7 @@ class ContractDetailsLastwill(CommonDetails):
         ) + 80000
         if network.name == 'RSK_MAINNET':
             result += 2 * NET_DECIMALS['ETH']
-        return 30 * NET_DECIMALS['USDT']
+        return 30 * NET_DECIMALS['DUC']
 
     @postponable
     @check_transaction
