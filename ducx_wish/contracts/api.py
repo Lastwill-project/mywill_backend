@@ -67,17 +67,8 @@ class ContractViewSet(ModelViewSet):
         if host == MY_WISH_URL:
             result = result.exclude(contract_type__in=[20, 21, 22, 23])
             # result = result.exclude(contract_type__in=[20, 21, 22])
-        if host == EOSISH_URL:
-            result = result.filter(contract_type__in=(10, 11, 12, 13, 14))
         if host == TRON_URL:
             result = result.exclude(contract_type__in=[20, 21])
-        if host == SWAPS_URL:
-            #result = result.filter(contract_type__in=[20, 21, 23])
-            result = result.filter(contract_type__in=[20])
-        if host == WAVES_URL:
-            result = result.filter(contract_type=22)
-        if host == TOKEN_PROTECTOR_URL:
-            result = result.filter(contract_type__in=[23])
         if self.request.user.is_staff:
             return result
         return result.filter(user=self.request.user)
