@@ -297,12 +297,9 @@ class ContractSerializer(serializers.ModelSerializer):
     def get_details_serializer(self, contract_type):
         return {
             0: ContractDetailsLastwillSerializer,
-            1: ContractDetailsLostKeySerializer,
             2: ContractDetailsDelayedPaymentSerializer,
             4: ContractDetailsICOSerializer,
             5: ContractDetailsTokenSerializer,
-            6: ContractDetailsNeoSerializer,
-            7: ContractDetailsNeoICOSerializer,
             8: ContractDetailsAirdropSerializer,
             9: ContractDetailsInvestmentPoolSerializer,
         }[contract_type]
