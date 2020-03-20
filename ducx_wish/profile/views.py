@@ -143,13 +143,10 @@ def profile_view(request):
         print('anonymous', flush=True)
         raise PermissionDenied()
     site_name = request.META['HTTP_HOST']
-    if site_name.startswith('cn'):
-        site_name = site_name[2:]
     if site_name.startswith('local'):
         print('cut local')
         site_name = site_name[5:]
-    if site_name.startswith('trondev'):
-        site_name = site_name.replace('trondev', 'dev')
+
     if site_name == WAVES_URL:
         site_name = MY_WISH_URL
     site = SubSite.objects.get(site_name=site_name)
@@ -162,24 +159,6 @@ def profile_view(request):
     else:
         user_name = request.user.username
 
-    swaps_notifications = None
-    swaps_notification_email = None
-    swaps_notification_telegram_name = None
-    swaps_notification_type = None
-
-    swaps_notification_set = request.user.swapsnotificationdefaults_set.all()
-    if swaps_notification_set:
-        swaps_notification_set = swaps_notification_set.first()
-        swaps_notification_email = swaps_notification_set.email
-        swaps_notification_telegram_name = swaps_notification_set.telegram_name
-        swaps_notification_type = swaps_notification_set.notification
-
-    swaps_notifications = {
-            'email': swaps_notification_email,
-            'telegram_name': swaps_notification_telegram_name,
-            'notification': swaps_notification_type
-        }
-
     answer = {
             'username': user_name,
             'contracts': Contract.objects.filter(user=request.user).count(),
@@ -191,12 +170,7 @@ def profile_view(request):
             'id': request.user.id,
             'lang': request.user.profile.lang,
             'memo': user_balance.memo,
-            'eos_address': 'mywishcoming',
-            'bnb_address': BINANCE_PAYMENT_ADDRESS,
-            'tron_address': hex2tronwif(user_balance.tron_address) if user_balance.tron_address else '',
             'usdt_balance': str(int(int(user_balance.balance) / 10 ** 18 * convert('WISH', 'USDT')['USDT'] * 10 ** 6)),
-            'is_swaps_admin': request.user.profile.is_swaps_admin,
-            'swaps_notifications': swaps_notifications
     }
     return Response(answer)
 

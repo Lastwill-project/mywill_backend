@@ -60,16 +60,10 @@ def init_profile(user, is_social=False, metamask_address=None, lang='en', swaps=
     registration_btc_address(btc_address1)
 
 
-
 class UserRegisterSerializer(RegisterSerializer):
     def save(self, request):
         user = super().save(request)
-        host = request.META['HTTP_HOST']
-        if host == SWAPS_URL:
-            swaps = True
-        else:
-            swaps = False
-        init_profile(user, lang=request.COOKIES.get('lang', 'en'), swaps=swaps)
+        init_profile(user, lang=request.COOKIES.get('lang', 'en'))
         return user
 
 

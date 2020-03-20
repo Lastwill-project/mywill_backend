@@ -22,7 +22,6 @@ from ducx_wish.contracts.models import (
     WhitelistAddress
 )
 from ducx_wish.contracts.serializers import ContractSerializer
-from ducx_wish.contracts.api import autodeploing
 from ducx_wish.settings import NETWORKS
 from ducx_wish.deploy.models import DeployAddress
 from ducx_wish.payments.api import create_payment
