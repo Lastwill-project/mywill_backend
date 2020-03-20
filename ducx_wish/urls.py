@@ -32,7 +32,7 @@ from ducx_wish.contracts.api import (ContractViewSet, get_code, test_comp,
                                      WhitelistAddressViewSet, AirdropAddressViewSet,
                                      load_airdrop, get_contract_for_link,
                                      get_invest_balance_day, check_status,
-                                     buy_brand_report, get_authio_cost,
+                                    buy_brand_report, get_authio_cost,
                                      get_testnet_tron_tokens, get_tokens_for_eth_address
                                      )
 from ducx_wish.contracts.api_common import get_contract_price, get_contracts, get_available_contracts
@@ -89,9 +89,6 @@ urlpatterns = [
     url(r'^api/get_contract_for_link/$', get_contract_for_link),
     url(r'^api/get_invest_balance_day/$', get_invest_balance_day),
     url(r'^api/check_status/$', check_status),
-    url(r'^api/get_eos_cost/$', get_eos_cost),
-    url(r'^api/get_eos_airdrop_cost/$', get_eos_airdrop_cost),
-    url(r'^api/check_eos_accounts_exists/$', check_eos_accounts_exists),
     url(r'^api/buy_brand_report/$', buy_brand_report),
     url(r'^api/get_authio_cost/$', get_authio_cost),
     url(r'^api/send_unblocking_feedback/$', send_unblocking_info),
