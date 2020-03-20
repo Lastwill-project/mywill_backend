@@ -14,10 +14,11 @@ from rest_auth.serializers import (
 )
 
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
-from ducx_wish.settings import ROOT_PUBLIC_KEY, ROOT_PUBLIC_KEY_EOSISH, BITCOIN_URLS, DUCATUSX_URL, EOSISH_URL, TRON_URL, \
-    ROOT_PUBLIC_KEY_TRON, ROOT_PUBLIC_KEY_SWAPS, SWAPS_URL, ROOT_PUBLIC_KEY_PROTECTOR, TOKEN_PROTECTOR_URL
+from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL
 from ducx_wish.profile.helpers import valid_totp
 from ducx_wish.profile.forms import SubSitePasswordResetForm
+from ducx_wish.bip32_ducatus import DucatusWallet
+
 
 def generate_memo(m):
     memo_str = os.urandom(8)
@@ -37,27 +38,25 @@ def registration_btc_address(btc_address):
     )
 
 
-def create_wish_balance(user, eth_address, btc_address, memo_str):
-    wish = SubSite.objects.get(site_name=DUCATUSX_URL)
+def create_wish_balance(user, duc_address, memo_str):
+    ducxwish = SubSite.objects.get(site_name=DUCATUSX_URL)
     UserSiteBalance(
-        user=user, subsite=wish,
-        eth_address=eth_address,
-        btc_address=btc_address,
-        tron_address='41' + eth_address[2:],
+        user=user, subsite=ducxwish,
+        duc_address=duc_address,
         memo=memo_str
     ).save()
 
 
 def init_profile(user, is_social=False, metamask_address=None, lang='en', swaps=False):
     m = hashlib.sha256()
-    memo_str1 = generate_memo(m)
-    wish_key = BIP32Key.fromExtendedKey(ROOT_PUBLIC_KEY, public=True)
-    btc_address1 = wish_key.ChildKey(user.id).Address()
-    eth_address1 = keys.PublicKey(wish_key.ChildKey(user.id).K.to_string()).to_checksum_address().lower()
+    memo_str = generate_memo(m)
+
+    duc_root_key = DucatusWallet.deserialize(ROOT_PUBLIC_KEY_DUCATUS)
+    duc_address = duc_root_key.get_child(user.id, is_prime=False).to_address()
 
     Profile(user=user, is_social=is_social, metamask_address=metamask_address, lang=lang, is_swaps=swaps).save()
-    create_wish_balance(user, eth_address1, btc_address1, memo_str1)
-    registration_btc_address(btc_address1)
+    create_wish_balance(user, duc_address, memo_str)
+    # registration_btc_address()
 
 
 class UserRegisterSerializer(RegisterSerializer):
