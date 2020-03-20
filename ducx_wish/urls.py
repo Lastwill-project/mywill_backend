@@ -32,8 +32,7 @@ from ducx_wish.contracts.api import (ContractViewSet, get_code, test_comp,
                                      WhitelistAddressViewSet, AirdropAddressViewSet,
                                      load_airdrop, get_contract_for_link,
                                      get_invest_balance_day, check_status,
-                                     get_eos_cost, get_eos_airdrop_cost,
-                                     check_eos_accounts_exists, buy_brand_report, get_authio_cost,
+                                     buy_brand_report, get_authio_cost,
                                      get_testnet_tron_tokens, get_tokens_for_eth_address
                                      )
 from ducx_wish.contracts.api_common import get_contract_price, get_contracts, get_available_contracts
