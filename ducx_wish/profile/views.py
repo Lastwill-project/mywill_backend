@@ -31,12 +31,10 @@ from allauth.account.utils import (
 )
 from allauth.account.models import EmailAddress, EmailConfirmation, EmailConfirmationHMAC
 
-from exchange_API import to_wish, convert
 from ducx_wish.contracts.models import Contract
 from ducx_wish.profile.helpers import valid_totp
-from ducx_wish.settings import BINANCE_PAYMENT_ADDRESS, MY_WISH_URL, SUPPORT_EMAIL, DEFAULT_FROM_EMAIL, WAVES_URL
+from ducx_wish.settings import MY_WISH_URL, SUPPORT_EMAIL, DEFAULT_FROM_EMAIL, WAVES_URL
 from ducx_wish.profile.models import SubSite, UserSiteBalance, APIToken
-
 
 
 class ConfirmEmailView(TemplateResponseMixin, View):
@@ -163,14 +161,12 @@ def profile_view(request):
             'username': user_name,
             'contracts': Contract.objects.filter(user=request.user).count(),
             'balance': str(user_balance.balance),
-            'internal_address': user_balance.eth_address,
-            'internal_btc_address': user_balance.btc_address,
+            'internal_address': user_balance.duc_address,
             'use_totp': request.user.profile.use_totp,
             'is_social': request.user.profile.is_social,
             'id': request.user.id,
             'lang': request.user.profile.lang,
             'memo': user_balance.memo,
-            'usdt_balance': str(int(int(user_balance.balance) / 10 ** 18 * convert('WISH', 'USDT')['USDT'] * 10 ** 6)),
     }
     return Response(answer)
 

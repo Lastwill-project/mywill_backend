@@ -29,7 +29,7 @@ from ducx_wish.contracts.decorators import *
 from ducx_wish.consts import NET_DECIMALS
 from ducx_wish.profile.models import *
 from ducx_wish.payments.api import create_payment
-from exchange_API import convert, bnb_to_wish
+from exchange_API import convert
 from ducx_wish.consts import MAIL_NETWORK
 import email_messages
 
