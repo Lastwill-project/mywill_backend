@@ -425,7 +425,7 @@ class CommonDetails(models.Model):
 
         gas_price = 41 * 10 ** 9
         sign_key = NETWORKS[self.contract.network.name]['private_key']
-        chain_id = NETWORKS[self.contract.network.name]['chain_id']
+        chain_id = eth_int.eth_chainId()
 
         tx_params = {
             'to': address,
