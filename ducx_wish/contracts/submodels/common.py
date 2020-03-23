@@ -7,6 +7,8 @@ from copy import deepcopy
 from base58 import b58decode
 from ethereum import abi
 
+from web3 import Web3, HTTPProvider, IPCProvider
+
 from django.db import models
 from django.apps import apps
 from django.core.mail import send_mail
@@ -422,19 +424,32 @@ class CommonDetails(models.Model):
         print('DATA', data, flush=True)
 
         gas_price = 41 * 10 ** 9
-        signed_data = sign_transaction(
-            address, nonce, self.get_gaslimit(),
-            self.contract.network.name, value=self.get_value(),
-            contract_data=data, gas_price=gas_price
-        )
+        sign_key = NETWORKS[self.contract.network.name]['private_key']
+        chain_id = NETWORKS[self.contract.network.name]['chain_id']
+
+        tx_params = {
+            'to': address,
+            'value': self.get_value(),
+            'gas': self.get_gaslimit(),
+            'gasPrice':gas_price,
+            'nonce': nonce,
+            'chainId': chain_id,
+            'data': data
+        }
+
+        w3 = Web3(HTTPProvider(eth_int.url))
+        signed_tx = w3.eth.account.signTransaction(tx_params, sign_key)
+        signed_tx_raw = signed_tx.rawTransaction
+
         print('fields of transaction', flush=True)
         print('source', address, flush=True)
         print('gas limit', self.get_gaslimit(), flush=True)
         print('value', self.get_value(), flush=True)
         print('network', self.contract.network.name, flush=True)
-        print('signed_data', signed_data, flush=True)
+        print('signed_data', signed_tx, flush=True)
+        print('signed_data raw', signed_tx_raw, flush=True)
         ducx_contract.tx_hash = eth_int.eth_sendRawTransaction(
-            '0x' + signed_data
+            '0x' + signed_tx_raw
         )
         ducx_contract.save()
         print('transaction sent', flush=True)
