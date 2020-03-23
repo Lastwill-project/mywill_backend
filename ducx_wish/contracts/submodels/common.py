@@ -438,7 +438,7 @@ class CommonDetails(models.Model):
 
         w3 = Web3(HTTPProvider(eth_int.url))
         signed_tx = w3.eth.account.signTransaction(tx_params, sign_key)
-        signed_tx_raw = signed_tx.rawTransaction
+        signed_tx_raw = signed_tx.rawTransaction.hex()
 
         print('fields of transaction', flush=True)
         print('source', address, flush=True)
