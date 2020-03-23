@@ -39,8 +39,8 @@ class Receiver(threading.Thread):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
             'localhost',
             5672,
-            'ducwill',
-            pika.PlainCredentials('ducwill', 'ducwill'),
+            'ducxwill',
+            pika.PlainCredentials('ducxwill', 'ducxwill'),
             heartbeat_interval=0,
         ))
 
