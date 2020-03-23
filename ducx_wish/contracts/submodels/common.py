@@ -447,9 +447,7 @@ class CommonDetails(models.Model):
         print('network', self.contract.network.name, flush=True)
         print('signed_data', signed_tx, flush=True)
         print('signed_data raw', signed_tx_raw, flush=True)
-        ducx_contract.tx_hash = eth_int.eth_sendRawTransaction(
-            '0x' + signed_tx_raw
-        )
+        ducx_contract.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
         ducx_contract.save()
         print('transaction sent', flush=True)
         self.contract.state = 'WAITING_FOR_DEPLOYMENT'
