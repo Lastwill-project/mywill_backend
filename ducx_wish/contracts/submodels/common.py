@@ -428,7 +428,6 @@ class CommonDetails(models.Model):
         chain_id = eth_int.eth_chainId()
 
         tx_params = {
-            'to': address,
             'value': self.get_value(),
             'gas': self.get_gaslimit(),
             'gasPrice':gas_price,
