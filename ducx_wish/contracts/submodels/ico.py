@@ -259,7 +259,7 @@ class ContractDetailsICO(CommonDetails):
         nonce = int(eth_int.eth_getTransactionCount(address, "pending"), 16)
         gas_limit = 100000 + 80000 * self.contract.tokenholder_set.all().count()
         print('nonce', nonce)
-        print('init message signed')
+
 
         sign_key = NETWORKS[self.contract.network.name]['private_key']
         chain_id = eth_int.eth_chainId()
@@ -275,10 +275,11 @@ class ContractDetailsICO(CommonDetails):
         #         tr.encode_function_call('init', [])
         #     ).decode()
         # }
-
+        print('init message signing',flush=True)
         w3 = Web3(HTTPProvider(eth_int.url))
         contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_crowdsale.address),
                                    abi=self.ducx_contract_crowdsale.abi)
+        print('building tx', flush=True)
         tx = contract.functions.init().buildTransaction(
             {'from': checksum_encode(NETWORKS[self.contract.network.name]['address']),
              'gas': gas_limit,
@@ -287,9 +288,12 @@ class ContractDetailsICO(CommonDetails):
              'gasPrice': 100000,
              }
         )
+        print('tx', tx, flush=True)
+        print('init message signing')
 
         signed_tx = w3.eth.account.signTransaction(tx, sign_key)
         signed_tx_raw = signed_tx.rawTransaction.hex()
+        print('signed tx raw', signed_tx_raw, flush=True)
 
         # signed_data = sign_transaction(
         #     address, nonce,
