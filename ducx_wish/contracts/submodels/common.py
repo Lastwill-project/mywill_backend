@@ -244,17 +244,6 @@ def sign_transaction(address, nonce, gaslimit, network, value=None, dest=None, c
     return signed_data['result']
 
 
-def sign_neo_transaction(tx, binary_tx, address):
-    scripts = requests.post(
-        'http://{}/neo_sign/'.format(SIGNER),
-        json={'binary_tx': binary_tx, 'address': address}
-    ).json()
-    tx.scripts = [Witness(
-        x['invocation'].encode(),
-        x['verification'].encode(),
-    ) for x in scripts]
-    return tx
-
 
 '''
 contract as user see it at site. contract as service. can contain more then one real ethereum contracts
@@ -464,39 +453,16 @@ class CommonDetails(models.Model):
         self.contract.state = 'ACTIVE'
         self.contract.save()
         if self.contract.user.email:
-            if self.contract.contract_type ==11:
-                send_mail(
-                    eos_account_subject,
-                    eos_account_message.format(
-                        link=network_link.format(address=self.account_name),
+            send_mail(
+                    common_subject,
+                    common_text.format(
+                        contract_type_name=self.contract.get_all_details_model()[self.contract.contract_type]['name'],
+                        link=network_link.format(address=ducx_contract.address),
                         network_name=network_name
                     ),
                     DEFAULT_FROM_EMAIL,
                     [self.contract.user.email]
-                )
-            elif self.contract.contract_type ==10:
-                send_mail(
-                    eos_contract_subject,
-                    eos_contract_message.format(
-                        token_name=self.token_short_name,
-                        network_name=network_name
-                    ),
-                    DEFAULT_FROM_EMAIL,
-                    [self.contract.user.email]
-                )
-            elif self.contract.contract_type == 20:
-                pass
-            else:
-                send_mail(
-                        common_subject,
-                        common_text.format(
-                            contract_type_name=self.contract.get_all_details_model()[self.contract.contract_type]['name'],
-                            link=network_link.format(address=ducx_contract.address),
-                            network_name=network_name
-                        ),
-                        DEFAULT_FROM_EMAIL,
-                        [self.contract.user.email]
-                )
+            )
 
     def get_value(self):
         return 0

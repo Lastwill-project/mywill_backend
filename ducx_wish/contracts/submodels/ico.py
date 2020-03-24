@@ -1,6 +1,7 @@
 import datetime
 
 from ethereum import abi
+from ethereum.utils import checksum_encode
 
 from django.db import models
 from django.core.mail import send_mail, EmailMessage
@@ -178,16 +179,36 @@ class ContractDetailsICO(CommonDetails):
             nonce = int(eth_int.eth_getTransactionCount(address, "pending"), 16)
             print('nonce', nonce)
             print('transferOwnership message signed')
-            signed_data = sign_transaction(
-                address, nonce, 100000, self.contract.network.name,
-                dest=self.ducx_contract_token.address,
-                contract_data=binascii.hexlify(tr.encode_function_call(
+
+            sign_key = NETWORKS[self.contract.network.name]['private_key']
+            chain_id = eth_int.eth_chainId()
+
+            tx_params = {
+                # 'value': self.get_value(),
+                'to': self.ducx_contract_token.address,
+                'gas': self.get_gaslimit(),
+                'gasPrice': 100000,
+                'nonce': nonce,
+                'chainId': chain_id,
+                'data': binascii.hexlify(tr.encode_function_call(
                     'transferOwnership', [self.ducx_contract_crowdsale.address]
-                )).decode(),
-            )
-            self.ducx_contract_token.tx_hash = eth_int.eth_sendRawTransaction(
-                '0x' + signed_data
-            )
+                )).decode()
+            }
+
+            w3 = Web3(HTTPProvider(eth_int.url))
+            signed_tx = w3.eth.account.signTransaction(tx_params, sign_key)
+            signed_tx_raw = signed_tx.rawTransaction.hex()
+
+            # contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_token.address), abi=self.ducx_contract_token.abi)
+
+            # signed_data = sign_transaction(
+            #     address, nonce, 100000, self.contract.network.name,
+            #     dest=self.ducx_contract_token.address,
+            #     contract_data=binascii.hexlify(tr.encode_function_call(
+            #         'transferOwnership', [self.ducx_contract_crowdsale.address]
+            #     )).decode(),
+            # )
+            self.ducx_contract_token.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
             self.ducx_contract_token.save()
             print('transferOwnership message sended')
 
@@ -231,18 +252,36 @@ class ContractDetailsICO(CommonDetails):
         gas_limit = 100000 + 80000 * self.contract.tokenholder_set.all().count()
         print('nonce', nonce)
         print('init message signed')
-        signed_data = sign_transaction(
-            address, nonce,
-            gas_limit,
-            self.contract.network.name,
-            dest=self.ducx_contract_crowdsale.address,
-            contract_data=binascii.hexlify(
+
+        sign_key = NETWORKS[self.contract.network.name]['private_key']
+        chain_id = eth_int.eth_chainId()
+
+        tx_params = {
+            # 'value': self.get_value(),
+            'to': self.ducx_contract_crowdsale.address,
+            'gas': gas_limit,
+            'gasPrice': 100000,
+            'nonce': nonce,
+            'chainId': chain_id,
+            'data': binascii.hexlify(
                 tr.encode_function_call('init', [])
             ).decode()
-        )
-        self.ducx_contract_crowdsale.tx_hash = eth_int.eth_sendRawTransaction(
-            '0x' + signed_data
-        )
+        }
+
+        w3 = Web3(HTTPProvider(eth_int.url))
+        signed_tx = w3.eth.account.signTransaction(tx_params, sign_key)
+        signed_tx_raw = signed_tx.rawTransaction.hex()
+
+        # signed_data = sign_transaction(
+        #     address, nonce,
+        #     gas_limit,
+        #     self.contract.network.name,
+        #     dest=self.ducx_contract_crowdsale.address,
+        #     contract_data=binascii.hexlify(
+        #         tr.encode_function_call('init', [])
+        #     ).decode()
+        # )
+        self.ducx_contract_crowdsale.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
         self.ducx_contract_crowdsale.save()
         print('init message sended')
 
