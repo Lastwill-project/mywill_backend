@@ -197,7 +197,7 @@ class ContractDetailsICO(CommonDetails):
 
             w3 = Web3(HTTPProvider(eth_int.url))
             contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_token.address), abi=self.ducx_contract_token.abi)
-            tx = contract.functions.transferOwnership(self.ducx_contract_crowdsale.address).buildTransaction(
+            tx = contract.functions.transferOwnership(checksum_encode(self.ducx_contract_crowdsale.address)).buildTransaction(
                 {'from': checksum_encode(NETWORKS[self.contract.network.name]['address']),
                  'gas': self.get_gaslimit(),
                  'chainId': chain_id,
