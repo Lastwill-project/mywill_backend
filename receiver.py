@@ -387,8 +387,8 @@ class WSInterface(threading.Thread):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
                 '127.0.0.1',
                 5672,
-                'mywill',
-                pika.PlainCredentials('java', 'java'),
+                'ducxwill',
+                pika.PlainCredentials('ducxwill', 'ducxwill'),
                 heartbeat_interval=0,
         ))
         self.channel = connection.channel()

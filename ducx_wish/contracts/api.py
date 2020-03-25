@@ -127,6 +127,7 @@ def deploy(request):
     contract.save()
     queue = NETWORKS[contract.network.name]['queue']
     send_in_queue(contract.id, 'launch', queue)
+    print('send to deploy queue', flush=True)
     return Response('ok')
 
 

@@ -93,8 +93,8 @@ def send_in_pika(contract):
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         'localhost',
         5672,
-        'mywill',
-        pika.PlainCredentials('java', 'java'),
+        'ducxwill',
+        pika.PlainCredentials('ducxwill', 'ducxwill'),
     ))
     queue = NETWORKS[contract.network.name]['queue']
     channel = connection.channel()

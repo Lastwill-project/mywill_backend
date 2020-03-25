@@ -207,8 +207,8 @@ def send_in_queue(contract_id, type, queue):
     connection = pika.BlockingConnection(pika.ConnectionParameters(
         'localhost',
         5672,
-        'mywill',
-        pika.PlainCredentials('java', 'java'),
+        'ducxwill',
+        pika.PlainCredentials('ducxwill', 'ducxwill'),
     ))
     channel = connection.channel()
     channel.queue_declare(queue=queue, durable=True, auto_delete=False,
