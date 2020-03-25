@@ -275,7 +275,7 @@ class ContractDetailsICO(CommonDetails):
         #         tr.encode_function_call('init', [])
         #     ).decode()
         # }
-        print('init message signing',flush=True)
+
         w3 = Web3(HTTPProvider(eth_int.url))
         contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_crowdsale.address),
                                    abi=self.ducx_contract_crowdsale.abi)
@@ -289,7 +289,7 @@ class ContractDetailsICO(CommonDetails):
              }
         )
         print('tx', tx, flush=True)
-        print('init message signing')
+        print('init message signing', flush=True)
 
         signed_tx = w3.eth.account.signTransaction(tx, sign_key)
         signed_tx_raw = signed_tx.rawTransaction.hex()
@@ -306,7 +306,7 @@ class ContractDetailsICO(CommonDetails):
         # )
         self.ducx_contract_crowdsale.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
         self.ducx_contract_crowdsale.save()
-        print('init message sended')
+        print('init message sended', flush=True)
 
     # crowdsale
     @postponable
