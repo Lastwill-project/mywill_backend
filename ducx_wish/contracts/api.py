@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from collections import OrderedDict
 
-from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS
+from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS, NETWORKS
 from ducx_wish.settings import DUCATUSX_URL
 from ducx_wish.permissions import IsOwner, IsStaff
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
