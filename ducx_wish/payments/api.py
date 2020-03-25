@@ -78,6 +78,7 @@ def positive_payment(user, value, site_id, currency, amount):
     UserSiteBalance.objects.select_for_update().filter(
         user=user, subsite__id=site_id).update(
             balance=F('balance') + value)
+    print('positive payment ok', flush=True)
 
 
 def negative_payment(user, value, site_id, network):
@@ -85,6 +86,7 @@ def negative_payment(user, value, site_id, network):
             user=user, subsite__id=site_id, balance__gte=value
     ).update(balance=F('balance') - value):
         raise ValidationError({'result': 3}, code=400)
+    print('negative payment ok', flush=True)
 
 
 def get_payment_statistics(start, stop=None):
