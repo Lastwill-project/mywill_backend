@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from ducx_wish.payments.models import InternalPayment
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
-from ducx_wish.settings import MY_WISH_URL, TRON_URL, SWAPS_URL, TOKEN_PROTECTOR_URL, NETWORKS
+from ducx_wish.settings import DUCATUSX_URL
 from ducx_wish.consts import NET_DECIMALS
 from exchange_API import to_wish, convert
 
@@ -17,53 +17,22 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
     if amount == 0.0:
         return
     print('create payment')
-    if (SubSite.objects.get(id=site_id).site_name == MY_WISH_URL
-            or SubSite.objects.get(id=site_id).site_name == TRON_URL):
-        if currency in ['BWISH', 'BBNB']:
-            amount = amount * 10 ** 10
-            if currency in ['BWISH']:
-                amount *= 1.1
-            if currency == 'BBNB':
-                currency = 'BNB'
-        value = amount if (currency in ['WISH', 'BWISH']) else to_wish(
-            currency, amount
-        )
-        if currency == 'BTC':
-            value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['BTC']
-        if currency in ['TRON', 'TRX', 'TRONISH']:
-            value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['TRX']
-        if currency in ['EOS', 'EOSISH']:
-            value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['EOS']
-        if currency == 'USDT':
-            value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['USDT']
-    # elif SubSite.objects.get(id=site_id).site_name == TRON_URL:
-    #     value = amount if currency in ('TRONISH', 'TRX') else amount * float(convert(
-    #         currency, 'TRX'
-    #     )['TRX']) / NET_DECIMALS[currency] * NET_DECIMALS['TRON']
-    elif SubSite.objects.get(id=site_id).site_name == SWAPS_URL:
-        value = amount if currency == 'USDT' else amount * float(convert(
-            currency, 'USDT'
-        )['USDT']) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
-
-    elif SubSite.objects.get(id=site_id).site_name == TOKEN_PROTECTOR_URL:
-        value = amount if currency == 'USDT' else amount * float(convert(
-            currency, 'USDT'
-        )['USDT']) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
+    if not SubSite.objects.get(id=site_id).site_name == DUCATUSX_URL:
+         raise Exception('Payment site is not ducatusx')
     else:
-        amount = calculate_decimals(currency, amount)
-        value = amount if currency == 'EOSISH' else amount * convert(currency, 'EOSISH')['EOSISH'] * NET_DECIMALS['EOSISH']
-        amount = add_decimals(currency, amount)
+        value = amount
     user = User.objects.get(id=uid)
     if amount < 0.0:
-        if site_id == 4 or site_id == 5:
-            try:
-                negative_payment(user, -value, site_id, network)
-            except:
-                print('-5% payment', flush=True)
-                value = value * 0.95
-                negative_payment(user, -value, site_id, network)
-        else:
-            negative_payment(user, -value, site_id, network)
+        # if site_id == 4 or site_id == 5:
+        #     try:
+        #         negative_payment(user, -value, site_id, network)
+        #     except:
+        #         print('-5% payment', flush=True)
+        #         value = value * 0.95
+        #         negative_payment(user, -value, site_id, network)
+        # else:
+        #     negative_payment(user, -value, site_id, network)
+        negative_payment(user, -value, site_id, network)
     else:
         positive_payment(user, value, site_id, currency, amount)
     site = SubSite.objects.get(id=site_id)
