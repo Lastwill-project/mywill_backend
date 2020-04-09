@@ -56,7 +56,7 @@ class ContractViewSet(ModelViewSet):
         if host == DUCATUSX_URL:
             result = result.exclude(contract_type__in=[20, 21, 22, 23])
             # result = result.exclude(contract_type__in=[20, 21, 22])
-        if self.request.user.is_staff:
+        if self.request.user.is_staff or self.request.user.is_ducx_admin:
             return result
         return result.filter(user=self.request.user)
 
