@@ -151,7 +151,7 @@ def send_to_ducatus_admin(contract, request):
 
     http_schema = request.scheme + '://'
     host = request.META['HTTP_HOST']
-    contract_url = join(http_schema, host, 'contracts', contract.id)
+    contract_url = join(http_schema, host, 'contracts', str(contract.id))
     print('contract url', contract_url, flush=True)
 
     EmailMessage(
