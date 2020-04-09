@@ -68,10 +68,10 @@ class IsStaff(permissions.BasePermission):
 @permission_logic
 class IsDucXAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user.is_staff
+        return request.user.profile.is_ducx_admin
 
     def has_permission(self, request, view):
-        return request.user.is_staff
+        return request.user.profile.is_ducx_admin
 
 @permission_logic
 class ReadOnly(permissions.BasePermission):
