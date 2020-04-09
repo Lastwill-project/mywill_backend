@@ -1,5 +1,9 @@
+import datetime
+from os.path import join
+
 from django.http import Http404, JsonResponse
 from django.views.generic import View
+from django.core.mail import send_mail, EmailMessage
 
 from rest_framework import status
 from rest_framework import viewsets
@@ -12,7 +16,7 @@ from rest_framework.exceptions import PermissionDenied
 from collections import OrderedDict
 
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS, NETWORKS
-from ducx_wish.settings import DUCATUSX_URL
+from ducx_wish.settings import DUCATUSX_URL, EMAIL_HOST_USER, DUCATUSX_CONFIRM_EMAIL, DEFAULT_FROM_EMAIL
 from ducx_wish.permissions import IsOwner, IsStaff
 from ducx_wish.profile.models import Profile
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
@@ -20,14 +24,14 @@ from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddres
 from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
-from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message
+from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message, \
+    ducatus_admin_confirm_subject, ducatus_admin_confirm_text
 from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer
 from ducx_wish.consts import *
 import requests
 from django.db.models import Q
 
 BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/20100101 Firefox/69.0'}
-
 
 
 class ContractViewSet(ModelViewSet):
@@ -115,9 +119,10 @@ def deploy(request):
     if contract.user != request.user or contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT'):
         raise PermissionDenied
 
-    if contract.network.name == 'DUCATUX_MAINNET':
+    if contract.network.name == 'DUCATUSX_MAINNET':
         if not contract.user.is_ducx_admin:
-            raise PermissionDenied
+            send_to_ducatus_admin(contract, request)
+            return Response('ok')
 
     cost = contract.cost
     currency = 'DUC'
@@ -130,6 +135,41 @@ def deploy(request):
     send_in_queue(contract.id, 'launch', queue)
     print('send to deploy queue', flush=True)
     return Response('ok')
+
+
+def send_to_ducatus_admin(contract, request):
+    details = contract.get_details()
+
+    mint_info = ''
+    token_holders = contract.tokenholder_set.all()
+    for th in token_holders:
+        mint_info = mint_info + '\n' + th.address + '\n'
+        mint_info = mint_info + str(th.amount) + '\n'
+        if th.freeze_date:
+            mint_info = mint_info + str(
+                datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
+
+    http_schema = request.scheme + '://'
+    host = request.META['HTTP_HOST']
+    contract_url = join(http_schema, host, 'contracts', contract.id)
+    print('contract url', contract_url, flush=True)
+
+    EmailMessage(
+        subject=ducatus_admin_confirm_subject,
+        body=ducatus_admin_confirm_text.format(
+            address=details.ducx_contract_token.address,
+            email=contract.feedback_email,
+            token_name=details.token_name,
+            token_short_name=details.token_short_name,
+            token_type=details.token_type,
+            decimals=details.decimals,
+            mint_info=mint_info if mint_info else 'No',
+            admin_address=details.admin_address,
+            confirm_url=contract_url
+        ),
+        from_email=DEFAULT_FROM_EMAIL,
+        to=[DUCATUSX_CONFIRM_EMAIL]
+    ).send()
 
 
 @api_view(http_method_names=['POST'])

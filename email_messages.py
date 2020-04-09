@@ -128,3 +128,27 @@ If you have any questions - please mail to support@mywish.io. We will contact yo
 Thank you,
 MyWish Team
 """
+
+ducatus_admin_confirm_subject = """MyWish - Request for deploying contract to DucatusX Mainnet"""
+ducatus_admin_confirm_text = """Hello!
+
+We want to inform you that the user {email} has created a contract and wanted
+to deploy it to DucatusX Main Network.
+
+Contract parameters (Source code):
+
+1) Token address: {address}
+2)Token name: {token_name}
+3) Token symbol: {token_short_name}
+4) Decimals: {decimals}
+5) Type of Token: {token_type}
+6) Token Owner: {admin_address}
+7) Mint/Freeze tokens: {mint_info}
+
+You can confirm or cancel contract here: {confirm_url}
+
+Please contact support@mywish.io if you have any questions.
+
+Best wishes,
+MyWish Team.
+"""
