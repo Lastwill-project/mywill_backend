@@ -1,5 +1,4 @@
 from django.core.mail import send_mail
-from django.contrib.sites.shortcuts import get_current_site
 from allauth.account.adapter import DefaultAccountAdapter
 from ducx_wish.settings import DUCATUSX_URL, EMAIL_HOST_USER
 from email_messages import register_subject, register_text
@@ -7,9 +6,9 @@ from email_messages import register_subject, register_text
 
 class SubSiteRegistrationAdapter(DefaultAccountAdapter):
 
-    def send_confirmation_mail(self, request, emailconfirmation, signup):
+    def send_confirmation_mail(self, request, emailconfirmation, signup):  
+        print('sending mail', flush=True)
         welcome_head = ''
-        current_site = get_current_site(request)
         activate_url = self.get_email_confirmation_url(request, emailconfirmation)
 
         to_user = emailconfirmation.email_address.user
@@ -30,3 +29,4 @@ class SubSiteRegistrationAdapter(DefaultAccountAdapter):
             from_email,
             [to_email]
         )
+        print('registration email sent', flush=True)
