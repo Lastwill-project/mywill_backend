@@ -183,18 +183,6 @@ class ContractDetailsICO(CommonDetails):
             sign_key = NETWORKS[self.contract.network.name]['private_key']
             chain_id = eth_int.eth_chainId()
 
-            # tx_params = {
-            #     # 'value': self.get_value(),
-            #     'to': self.ducx_contract_token.address,
-            #     'gas': self.get_gaslimit(),
-            #     'gasPrice': 100000,
-            #     'nonce': nonce,
-            #     'chainId': chain_id,
-            #     'data': binascii.hexlify(tr.encode_function_call(
-            #         'transferOwnership', [self.ducx_contract_crowdsale.address]
-            #     )).decode()
-            # }
-
             w3 = Web3(HTTPProvider(eth_int.url))
             contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_token.address), abi=self.ducx_contract_token.abi)
             tx = contract.functions.transferOwnership(checksum_encode(self.ducx_contract_crowdsale.address)).buildTransaction(
@@ -209,13 +197,6 @@ class ContractDetailsICO(CommonDetails):
             signed_tx = w3.eth.account.signTransaction(tx, sign_key)
             signed_tx_raw = signed_tx.rawTransaction.hex()
 
-            # signed_data = sign_transaction(
-            #     address, nonce, 100000, self.contract.network.name,
-            #     dest=self.ducx_contract_token.address,
-            #     contract_data=binascii.hexlify(tr.encode_function_call(
-            #         'transferOwnership', [self.ducx_contract_crowdsale.address]
-            #     )).decode(),
-            # )
             self.ducx_contract_token.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
             self.ducx_contract_token.save()
             print('transferOwnership message sended')
@@ -264,18 +245,6 @@ class ContractDetailsICO(CommonDetails):
         sign_key = NETWORKS[self.contract.network.name]['private_key']
         chain_id = eth_int.eth_chainId()
 
-        # tx_params = {
-        #     # 'value': self.get_value(),
-        #     'to': self.ducx_contract_crowdsale.address,
-        #     'gas': gas_limit,
-        #     'gasPrice': 100000,
-        #     'nonce': nonce,
-        #     'chainId': chain_id,
-        #     'data': binascii.hexlify(
-        #         tr.encode_function_call('init', [])
-        #     ).decode()
-        # }
-
         w3 = Web3(HTTPProvider(eth_int.url))
         contract = w3.eth.contract(address=checksum_encode(self.ducx_contract_crowdsale.address),
                                    abi=self.ducx_contract_crowdsale.abi)
@@ -295,15 +264,6 @@ class ContractDetailsICO(CommonDetails):
         signed_tx_raw = signed_tx.rawTransaction.hex()
         print('signed tx raw', signed_tx_raw, flush=True)
 
-        # signed_data = sign_transaction(
-        #     address, nonce,
-        #     gas_limit,
-        #     self.contract.network.name,
-        #     dest=self.ducx_contract_crowdsale.address,
-        #     contract_data=binascii.hexlify(
-        #         tr.encode_function_call('init', [])
-        #     ).decode()
-        # )
         self.ducx_contract_crowdsale.tx_hash = eth_int.eth_sendRawTransaction(signed_tx_raw)
         self.ducx_contract_crowdsale.save()
         print('init message sended', flush=True)

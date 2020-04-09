@@ -137,13 +137,11 @@ to deploy it to DucatusX Main Network.
 
 Contract parameters (Source code):
 
-1) Token address: {address}
-2)Token name: {token_name}
-3) Token symbol: {token_short_name}
-4) Decimals: {decimals}
-5) Type of Token: {token_type}
-6) Token Owner: {admin_address}
-7) Mint/Freeze tokens: {mint_info}
+1) Token name: {token_name}
+2) Token symbol: {token_short_name}
+3) Decimals: {decimals}
+4) Type of Token: {token_type}
+5) Token Owner: {admin_address}
 
 You can confirm or cancel contract here: {confirm_url}
 
