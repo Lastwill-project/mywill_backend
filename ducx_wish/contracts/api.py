@@ -17,7 +17,7 @@ from collections import OrderedDict
 
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS, NETWORKS
 from ducx_wish.settings import DUCATUSX_URL, EMAIL_HOST_USER, DUCATUSX_CONFIRM_EMAIL, DEFAULT_FROM_EMAIL
-from ducx_wish.permissions import IsOwner, IsStaff
+from ducx_wish.permissions import IsOwner, IsStaff, IsDucXAdmin
 from ducx_wish.profile.models import Profile
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
     ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
@@ -37,7 +37,7 @@ BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/
 class ContractViewSet(ModelViewSet):
     queryset = Contract.objects.all()
     serializer_class = ContractSerializer
-    permission_classes = (IsAuthenticated, IsStaff | IsOwner)
+    permission_classes = (IsAuthenticated, IsStaff | IsOwner | IsDucXAdmin)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
