@@ -157,7 +157,7 @@ def send_to_ducatus_admin(contract, request):
     EmailMessage(
         subject=ducatus_admin_confirm_subject,
         body=ducatus_admin_confirm_text.format(
-            address=details.ducx_contract_token.address,
+            # address=details.ducx_contract_token.address,
             email=contract.feedback_email,
             token_name=details.token_name,
             token_short_name=details.token_short_name,
