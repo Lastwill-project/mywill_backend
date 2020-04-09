@@ -140,14 +140,14 @@ def deploy(request):
 def send_to_ducatus_admin(contract, request):
     details = contract.get_details()
 
-    mint_info = ''
-    token_holders = contract.tokenholder_set.all()
-    for th in token_holders:
-        mint_info = mint_info + '\n' + th.address + '\n'
-        mint_info = mint_info + str(th.amount) + '\n'
-        if th.freeze_date:
-            mint_info = mint_info + str(
-                datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
+    # mint_info = ''
+    # token_holders = contract.tokenholder_set.all()
+    # for th in token_holders:
+    #     mint_info = mint_info + '\n' + th.address + '\n'
+    #     mint_info = mint_info + str(th.amount) + '\n'
+    #     if th.freeze_date:
+    #         mint_info = mint_info + str(
+    #             datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
 
     http_schema = request.scheme + '://'
     host = request.META['HTTP_HOST']
@@ -163,7 +163,7 @@ def send_to_ducatus_admin(contract, request):
             token_short_name=details.token_short_name,
             token_type=details.token_type,
             decimals=details.decimals,
-            mint_info=mint_info if mint_info else 'No',
+            # mint_info=mint_info if mint_info else 'No',
             admin_address=details.admin_address,
             confirm_url=contract_url
         ),
