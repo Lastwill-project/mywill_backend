@@ -156,9 +156,9 @@ def send_to_ducatus_admin(contract, request):
     contract_url = join(http_schema, host, 'contracts', str(contract.id))
     print('contract url', contract_url, flush=True)
 
-    EmailMessage(
-        subject=ducatus_admin_confirm_subject,
-        body=ducatus_admin_confirm_text.format(
+    send_mail(
+        ducatus_admin_confirm_subject,
+        ducatus_admin_confirm_text.format(
             # address=details.ducx_contract_token.address,
             email=contract.feedback_email,
             token_name=details.token_name,
@@ -169,9 +169,9 @@ def send_to_ducatus_admin(contract, request):
             admin_address=details.admin_address,
             confirm_url=contract_url
         ),
-        from_email=EMAIL_HOST_USER,
-        to=[DUCATUSX_CONFIRM_EMAIL]
-    ).send()
+        EMAIL_HOST_USER,
+        [DUCATUSX_CONFIRM_EMAIL]
+    )
 
 
 @api_view(http_method_names=['POST'])
