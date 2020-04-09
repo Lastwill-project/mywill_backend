@@ -80,7 +80,15 @@ class ContractSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        user = self.context['request'].user
+        validated_data['user'] = user
+
+        if user.email == '':
+            if not validated_data['feedback_email']:
+                raise ValidationError
+            else:
+                validated_data['feedback_email'] = user.email
+
         if validated_data.get('state') not in ('CREATED', 'WAITING_FOR_PAYMENT'):
             validated_data['state'] = 'CREATED'
 

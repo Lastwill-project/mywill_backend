@@ -14,6 +14,7 @@ from collections import OrderedDict
 from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEYS, NETWORKS
 from ducx_wish.settings import DUCATUSX_URL
 from ducx_wish.permissions import IsOwner, IsStaff
+from ducx_wish.profile.models import Profile
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
     ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
 from ducx_wish.deploy.models import Network
@@ -105,10 +106,6 @@ def get_token_contracts(request):
     return Response(res)
 
 
-
-
-
-
 @api_view(http_method_names=['POST'])
 def deploy(request):
     contract = Contract.objects.get(id=request.data.get('id'))
@@ -117,6 +114,10 @@ def deploy(request):
 
     if contract.user != request.user or contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT'):
         raise PermissionDenied
+
+    if contract.network.name == 'DUCATUX_MAINNET':
+        if not contract.user.is_ducx_admin:
+            raise PermissionDenied
 
     cost = contract.cost
     currency = 'DUC'
@@ -128,6 +129,20 @@ def deploy(request):
     queue = NETWORKS[contract.network.name]['queue']
     send_in_queue(contract.id, 'launch', queue)
     print('send to deploy queue', flush=True)
+    return Response('ok')
+
+
+@api_view(http_method_names=['POST'])
+def cancel_ducatusx_contract(request):
+    contract = Contract.objects.get(id=request.date.get('id'))
+
+    profile = Profile.objects.get(user=request.user)
+    if not profile.is_ducx_admin:
+        raise PermissionDenied
+
+    contract.state = 'CANCELLED'
+    contract.save()
+
     return Response('ok')
 
 

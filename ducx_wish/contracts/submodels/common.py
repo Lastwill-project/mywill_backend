@@ -282,6 +282,8 @@ class Contract(models.Model):
 
     invisible = models.BooleanField(default=False)
 
+    feedback_email = models.CharField(null=True)
+
     def save(self, *args, **kwargs):
         # disable balance saving to prevent collisions with java daemon
         print(args)
