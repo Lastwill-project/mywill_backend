@@ -120,7 +120,7 @@ def deploy(request):
         raise PermissionDenied
 
     if contract.network.name == 'DUCATUSX_MAINNET':
-        if not contract.user.is_ducx_admin:
+        if not contract.user.profile.is_ducx_admin:
             send_to_ducatus_admin(contract, request)
             return Response('ok')
 
@@ -176,8 +176,7 @@ def send_to_ducatus_admin(contract, request):
 def cancel_ducatusx_contract(request):
     contract = Contract.objects.get(id=request.date.get('id'))
 
-    profile = Profile.objects.get(user=request.user)
-    if not profile.is_ducx_admin:
+    if not request.user.profile.is_ducx_admin:
         raise PermissionDenied
 
     contract.state = 'CANCELLED'
