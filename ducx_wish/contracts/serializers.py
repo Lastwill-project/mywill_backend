@@ -86,8 +86,8 @@ class ContractSerializer(serializers.ModelSerializer):
         if user.email == '':
             if not validated_data['feedback_email']:
                 raise ValidationError
-            else:
-                validated_data['feedback_email'] = user.email
+        else:
+            validated_data['feedback_email'] = user.email
 
         if validated_data.get('state') not in ('CREATED', 'WAITING_FOR_PAYMENT'):
             validated_data['state'] = 'CREATED'
