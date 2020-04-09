@@ -167,7 +167,7 @@ def send_to_ducatus_admin(contract, request):
             admin_address=details.admin_address,
             confirm_url=contract_url
         ),
-        from_email=DEFAULT_FROM_EMAIL,
+        from_email=EMAIL_HOST_USER,
         to=[DUCATUSX_CONFIRM_EMAIL]
     ).send()
 
