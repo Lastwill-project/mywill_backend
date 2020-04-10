@@ -19,6 +19,7 @@ class Profile(models.Model):
     is_swaps = models.BooleanField(default=False)
     is_swaps_admin = models.BooleanField(default=False)
     is_ducx_admin = models.BooleanField(default=False)
+    latest_feedback_email = models.CharField(max_length=200, null=True, default=None)
 
 
 class SubSite(models.Model):

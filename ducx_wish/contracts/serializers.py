@@ -83,11 +83,13 @@ class ContractSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['user'] = user
 
-        if user.email == '':
+        network = validated_data['network']
+        if network.name == 'DUCATUSX_MAINNET':
             if not validated_data['feedback_email']:
-                raise ValidationError('User does not have email in profile and feedback_email is not passed')
-        else:
-            validated_data['feedback_email'] = user.email
+                raise ValidationError('feedback_email is not passed')
+
+            user.profile.latest_feedback_email = validated_data['feedback_email']
+            user.profile.save()
 
         if validated_data.get('state') not in ('CREATED', 'WAITING_FOR_PAYMENT'):
             validated_data['state'] = 'CREATED'
@@ -113,7 +115,7 @@ class ContractSerializer(serializers.ModelSerializer):
         finally:
             transaction.set_autocommit(True)
         if validated_data['user'].email:
-            network = validated_data['network']
+
             network_name = MAIL_NETWORK[network.name]
             if contract.contract_type not in (11, 20, 21, 23):
                 send_mail(
