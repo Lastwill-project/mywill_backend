@@ -159,7 +159,7 @@ def send_to_ducatus_admin(contract, request):
 
     mail_subject = ducatus_admin_confirm_subject
     mail_from = EMAIL_HOST_USER
-    mail_to = [DUCATUSX_CONFIRM_EMAIL]
+    mail_to = DUCATUSX_CONFIRM_EMAIL
     mail_user = contract.feedback_email
 
     if contract.contract_type == 4:
