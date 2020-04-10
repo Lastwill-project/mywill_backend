@@ -58,7 +58,7 @@ class ContractViewSet(ModelViewSet):
             # result = result.exclude(contract_type__in=[20, 21, 22])
         if self.request.user.is_staff:
             return result
-        if self.request.user.is_ducx_admin:
+        if self.request.user.profile.is_ducx_admin:
             return result.filter(network__name='DUCATUSX_MAINNET')
         return result.filter(user=self.request.user)
 
