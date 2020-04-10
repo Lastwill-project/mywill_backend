@@ -85,7 +85,7 @@ class ContractSerializer(serializers.ModelSerializer):
 
         if user.email == '':
             if not validated_data['feedback_email']:
-                raise ValidationError
+                raise ValidationError('User does not have email in profile and feedback_email is not passed')
         else:
             validated_data['feedback_email'] = user.email
 
