@@ -170,7 +170,7 @@ def send_to_ducatus_admin(contract, request):
             token_type=details.token_type,
             decimals=details.decimals,
             admin_address=details.admin_address,
-            token_rate=details.token_rate,
+            token_rate=details.rate,
             hard_cap_tokens=details.hard_cap,
             soft_cap_tokens=details.soft_cap,
             start_date=details.start_date,
