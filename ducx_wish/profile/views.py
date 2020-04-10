@@ -167,6 +167,8 @@ def profile_view(request):
             'id': request.user.id,
             'lang': request.user.profile.lang,
             'memo': user_balance.memo,
+            'is_ducx_admin': request.user.profile.is_ducx_admin,
+            'latest_feedback_email': request.user.profile.latest_feedback_email
     }
     return Response(answer)
 
