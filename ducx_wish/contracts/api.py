@@ -122,8 +122,9 @@ def deploy(request):
         raise PermissionDenied
 
     if contract.network.name == 'DUCATUSX_MAINNET':
-        if not contract.user.profile.is_ducx_admin:
-
+        if not request.user.profile.is_ducx_admin:
+            raise PermissionDenied
+        else:
             if contract.state == 'WAITING_FOR_CONFIRMATION':
                 print('already sent to confirmation', flush=True)
                 return Response('ok')
