@@ -132,14 +132,14 @@ def deploy(request):
         # if not request.user.profile.is_ducx_admin:
         #    raise PermissionDenied
         # else:
-        if contract.state == 'WAITING_FOR_CONFIRMATION':
+        if contract.user == request.user and contract.state == 'WAITING_FOR_CONFIRMATION':
             print('already sent to confirmation', flush=True)
             return Response('ok')
         else:
             send_to_ducatus_admin(contract, request)
             contract.state = 'WAITING_FOR_CONFIRMATION'
             contract.save()
-        return Response('ok')
+            return Response('ok')
 
     cost = contract.cost
     currency = 'DUC'
