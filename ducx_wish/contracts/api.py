@@ -118,7 +118,10 @@ def deploy(request):
     contract_details = contract.get_details()
     contract_details.predeploy_validate()
 
-    if contract.user != request.user or contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT', 'WAITING_FOR_CONFIRMATION'):
+    if contract.user != request.user or not request.user.profile.is_ducx_admin:
+        raise PermissionDenied
+
+    if contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT', 'WAITING_FOR_CONFIRMATION'):
         raise PermissionDenied
 
     if contract.network.name == 'DUCATUSX_MAINNET':
