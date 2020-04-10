@@ -130,7 +130,7 @@ def deploy(request):
     currency = 'DUC'
     site_id = 1
     network = contract.network.name
-    create_payment(request.user.id, '', currency, -cost, site_id, network)
+    create_payment(contract.user.id, '', currency, -cost, site_id, network)
     contract.state = 'WAITING_FOR_DEPLOYMENT'
     contract.save()
     queue = NETWORKS[contract.network.name]['queue']
