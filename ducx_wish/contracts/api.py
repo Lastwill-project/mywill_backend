@@ -118,24 +118,28 @@ def deploy(request):
     contract_details = contract.get_details()
     contract_details.predeploy_validate()
 
-    if contract.user != request.user or not request.user.profile.is_ducx_admin:
-        raise PermissionDenied
+    if contract.user != request.user:
+        if not request.user.profile.is_ducx_admin:
+            raise PermissionDenied
+
+    # if contract.user != request.user or not request.user.profile.is_ducx_admin:
+    #    raise PermissionDenied
 
     if contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT', 'WAITING_FOR_CONFIRMATION'):
         raise PermissionDenied
 
     if contract.network.name == 'DUCATUSX_MAINNET':
-        if not request.user.profile.is_ducx_admin:
-            raise PermissionDenied
-        else:
-            if contract.state == 'WAITING_FOR_CONFIRMATION':
-                print('already sent to confirmation', flush=True)
-                return Response('ok')
-            else:
-                send_to_ducatus_admin(contract, request)
-                contract.state = 'WAITING_FOR_CONFIRMATION'
-                contract.save()
+        # if not request.user.profile.is_ducx_admin:
+        #    raise PermissionDenied
+        # else:
+        if contract.state == 'WAITING_FOR_CONFIRMATION':
+            print('already sent to confirmation', flush=True)
             return Response('ok')
+        else:
+            send_to_ducatus_admin(contract, request)
+            contract.state = 'WAITING_FOR_CONFIRMATION'
+            contract.save()
+        return Response('ok')
 
     cost = contract.cost
     currency = 'DUC'
