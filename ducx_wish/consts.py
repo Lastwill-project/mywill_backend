@@ -1,7 +1,7 @@
 MAX_WEI_DIGITS = len(str(2**256))
 MAIL_NETWORK = {
-    'DUCATUSX_MAINNET': 'Ethereum',
-    'DUCATUSX_TESTNET': 'Ropsten (Ethereum Testnet)',
+    'DUCATUSX_MAINNET': 'DucatusX',
+    'DUCATUSX_TESTNET': 'DucatusX (Testnet)',
     'RSK_MAINNET': 'RSK',
     'RSK_TESTNET': 'RSK Testnet',
     'NEO_TESTNET': 'NEO Test Net',
