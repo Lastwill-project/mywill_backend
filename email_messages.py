@@ -130,11 +130,46 @@ MyWish Team
 """
 
 ducatus_admin_confirm_subject = """MyWish - Request for deploying contract to DucatusX Mainnet"""
-ducatus_admin_confirm_text = """Hello!
+ducatus_admin_confirm_ico_text = """Hello!
 
 We want to inform you that the user {email} has created a contract and wanted
 to deploy it to DucatusX Main Network.
 
+Contract type: DucatusX Crowdsale (ICO)
+Contract parameters (Source code):
+
+Token details:
+1) Token name: {token_name}
+2) Token symbol: {token_short_name}
+3) Decimals: {decimals}
+4) Type of Token: {token_type}
+5) Token Owner: {admin_address}
+
+Crowdsale details:
+1) Token rate: {token_rate}
+2) Hard cap tokens: {hard_cap_tokens}
+3) Soft cap tokens: {soft_cap_tokens}
+4) Start date: {start_date}
+5) Stop date: {stop_date}
+6) Transferable: {transferable}
+7) Investments storage address: {cold_wallet_address}
+8) Whitelist: {whitelist}
+9) Changing dates: {changing_dates}
+
+
+To see more details, confirm or cancel contract - click here: {confirm_url}
+
+Please contact support@mywish.io if you have any questions.
+
+Best wishes,
+MyWish Team.
+"""
+ducatus_admin_confirm_token_text = """Hello!
+
+We want to inform you that the user {email} has created a contract and wanted
+to deploy it to DucatusX Main Network.
+
+Contract type: DucatusX Token
 Contract parameters (Source code):
 
 1) Token name: {token_name}
@@ -143,7 +178,8 @@ Contract parameters (Source code):
 4) Type of Token: {token_type}
 5) Token Owner: {admin_address}
 
-You can confirm or cancel contract here: {confirm_url}
+
+To see more details, confirm or cancel contract - click here: {confirm_url}
 
 Please contact support@mywish.io if you have any questions.
 

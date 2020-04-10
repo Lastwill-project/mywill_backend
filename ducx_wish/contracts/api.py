@@ -25,7 +25,7 @@ from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
 from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message, \
-    ducatus_admin_confirm_subject, ducatus_admin_confirm_text
+    ducatus_admin_confirm_subject, ducatus_admin_confirm_ico_text, ducatus_admin_confirm_token_text
 from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer
 from ducx_wish.consts import *
 import requests
@@ -121,9 +121,14 @@ def deploy(request):
 
     if contract.network.name == 'DUCATUSX_MAINNET':
         if not contract.user.profile.is_ducx_admin:
-            send_to_ducatus_admin(contract, request)
-            contract.state = 'WAITING_FOR_CONFIRMATION'
-            contract.save()
+
+            if contract.state == 'WAITING_FOR_CONFIRMATION':
+                print('already sent to confirmation', flush=True)
+                return Response('ok')
+            else:
+                send_to_ducatus_admin(contract, request)
+                contract.state = 'WAITING_FOR_CONFIRMATION'
+                contract.save()
             return Response('ok')
 
     cost = contract.cost
@@ -142,36 +147,54 @@ def deploy(request):
 def send_to_ducatus_admin(contract, request):
     details = contract.get_details()
 
-    # mint_info = ''
-    # token_holders = contract.tokenholder_set.all()
-    # for th in token_holders:
-    #     mint_info = mint_info + '\n' + th.address + '\n'
-    #     mint_info = mint_info + str(th.amount) + '\n'
-    #     if th.freeze_date:
-    #         mint_info = mint_info + str(
-    #             datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
-
     http_schema = request.scheme + '://'
     host = request.META['HTTP_HOST']
     contract_url = join(http_schema, host, 'contracts', str(contract.id))
     print('contract url', contract_url, flush=True)
 
-    send_mail(
-        ducatus_admin_confirm_subject,
-        ducatus_admin_confirm_text.format(
-            # address=details.ducx_contract_token.address,
-            email=contract.feedback_email,
+    mail_subject = ducatus_admin_confirm_subject
+    mail_from = EMAIL_HOST_USER
+    mail_to = [DUCATUSX_CONFIRM_EMAIL]
+    mail_user = contract.feedback_email
+
+    if contract.contract_type == 4:
+        mail_text = ducatus_admin_confirm_ico_text.format(
+            email=mail_user,
             token_name=details.token_name,
             token_short_name=details.token_short_name,
             token_type=details.token_type,
             decimals=details.decimals,
-            # mint_info=mint_info if mint_info else 'No',
+            admin_address=details.admin_address,
+            token_rate=details.token_rate,
+            hard_cap_tokens=details.hard_cap,
+            soft_cap_tokens=details.soft_cap,
+            start_date=details.start_date,
+            stop_date=details.stop_date,
+            transferable=details.is_transferable_at_once,
+            cold_wallet_address=details.cold_wallet_address,
+            whitelist=details.whitelist,
+            changing_dates=details.allow_change_dates,
+            confirm_url=contract_url
+        )
+    elif contract.contract_type == 5:
+        mail_text = ducatus_admin_confirm_token_text.format(
+            email=mail_user,
+            token_name=details.token_name,
+            token_short_name=details.token_short_name,
+            token_type=details.token_type,
+            decimals=details.decimals,
             admin_address=details.admin_address,
             confirm_url=contract_url
-        ),
-        EMAIL_HOST_USER,
-        [DUCATUSX_CONFIRM_EMAIL]
+        )
+
+    send_mail(
+        mail_subject,
+        mail_text,
+        mail_from,
+        [mail_to]
     )
+
+
 
 
 @api_view(http_method_names=['POST'])
