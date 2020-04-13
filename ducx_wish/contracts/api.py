@@ -202,7 +202,7 @@ def send_to_ducatus_admin(contract, request):
 
 @api_view(http_method_names=['POST'])
 def cancel_ducatusx_contract(request):
-    contract = Contract.objects.get(id=request.date.get('id'))
+    contract = Contract.objects.get(id=request.data.get('id'))
 
     if not request.user.profile.is_ducx_admin:
         raise PermissionDenied
