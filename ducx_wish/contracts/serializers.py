@@ -67,7 +67,7 @@ class ContractSerializer(serializers.ModelSerializer):
         model = Contract
         fields = (
             'id', 'user', 'owner_address', 'state', 'created_date', 'balance',
-            'cost', 'name', 'contract_type', 'contract_details', 'network', 'feedback_email'
+            'cost', 'name', 'contract_type', 'contract_details', 'network'
         )
         extra_kwargs = {
             'user': {'read_only': True},
@@ -77,6 +77,7 @@ class ContractSerializer(serializers.ModelSerializer):
             'cost': {'read_only': True},
             'last_check': {'read_only': True},
             'next_check': {'read_only': True},
+            'feedback_email': {'read_only': True},
         }
 
     def create(self, validated_data):
