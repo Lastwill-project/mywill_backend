@@ -89,7 +89,7 @@ class ContractDetailsICO(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        return int(125 * NET_DECIMALS['DUC'])
+        return int(377 * NET_DECIMALS['DUC'])
 
     def compile(self, ducx_contract_attr_name='ducx_contract_token'):
         print('ico_contract compile')
@@ -360,9 +360,9 @@ class ContractDetailsToken(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        result = int(79 * NET_DECIMALS['DUC'])
+        result = int(144 * NET_DECIMALS['DUC'])
         if 'authio' in kwargs and kwargs['authio']:
-            result = int(79 + 450 * NET_DECIMALS['DUC'])
+            result = int(144 + 450 * NET_DECIMALS['DUC'])
         return result
 
     def get_arguments(self, ducx_contract_attr_name):
