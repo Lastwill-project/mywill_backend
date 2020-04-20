@@ -62,12 +62,13 @@ class TokenHolderSerializer(serializers.ModelSerializer):
 
 class ContractSerializer(serializers.ModelSerializer):
     contract_details = serializers.JSONField(write_only=True)
+    feedback_email = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = Contract
         fields = (
             'id', 'user', 'owner_address', 'state', 'created_date', 'balance',
-            'cost', 'name', 'contract_type', 'contract_details', 'network', 'feedback_email'
+            'cost', 'name', 'contract_type', 'contract_details', 'network'
         )
         extra_kwargs = {
             'user': {'read_only': True},
