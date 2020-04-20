@@ -77,7 +77,7 @@ class ContractSerializer(serializers.ModelSerializer):
             'cost': {'read_only': True},
             'last_check': {'read_only': True},
             'next_check': {'read_only': True},
-            'feedback_email': {'read_only': True},
+            'feedback_email': {'read_only': False},
         }
 
     def create(self, validated_data):
