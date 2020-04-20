@@ -282,7 +282,7 @@ class Contract(models.Model):
 
     invisible = models.BooleanField(default=False)
 
-    feedback_email = models.CharField(max_length=200, null=True, default=None, allow_blank=True)
+    feedback_email = models.CharField(max_length=200, null=True, default=None)
 
     def save(self, *args, **kwargs):
         # disable balance saving to prevent collisions with java daemon
