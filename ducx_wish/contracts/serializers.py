@@ -68,7 +68,7 @@ class ContractSerializer(serializers.ModelSerializer):
         model = Contract
         fields = (
             'id', 'user', 'owner_address', 'state', 'created_date', 'balance',
-            'cost', 'name', 'contract_type', 'contract_details', 'network'
+            'cost', 'name', 'contract_type', 'contract_details', 'network', 'feedback_email'
         )
         extra_kwargs = {
             'user': {'read_only': True},
