@@ -67,7 +67,7 @@ class ContractSerializer(serializers.ModelSerializer):
         model = Contract
         fields = (
             'id', 'user', 'owner_address', 'state', 'created_date', 'balance',
-            'cost', 'name', 'contract_type', 'contract_details', 'network'
+            'cost', 'name', 'contract_type', 'contract_details', 'network', 'feedback_email'
         )
         extra_kwargs = {
             'user': {'read_only': True},
@@ -77,7 +77,7 @@ class ContractSerializer(serializers.ModelSerializer):
             'cost': {'read_only': True},
             'last_check': {'read_only': True},
             'next_check': {'read_only': True},
-            'feedback_email': {'read_only': False},
+            # 'feedback_email': {'read_only': False},
         }
 
     def create(self, validated_data):
@@ -91,6 +91,9 @@ class ContractSerializer(serializers.ModelSerializer):
 
             user.profile.latest_feedback_email = validated_data['feedback_email']
             user.profile.save()
+        else:
+            if not validated_data['feedback_email']:
+                validated_data['feedback_email'] = None
 
         if validated_data.get('state') not in ('CREATED', 'WAITING_FOR_PAYMENT'):
             validated_data['state'] = 'CREATED'
