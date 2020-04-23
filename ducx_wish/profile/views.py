@@ -163,7 +163,7 @@ def profile_view(request):
             'balance': str(user_balance.balance),
             # 'internal_address': user_balance.duc_address,
             'usdc_address': user_balance.eth_address,
-            'ducx_address': user_balance.ducx_address,
+            'ducx_address': user_balance.eth_address,
             'use_totp': request.user.profile.use_totp,
             'is_social': request.user.profile.is_social,
             'id': request.user.id,

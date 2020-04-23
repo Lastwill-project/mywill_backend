@@ -362,7 +362,7 @@ class ContractDetailsToken(CommonDetails):
             return 0
         result = int(89 * NET_DECIMALS['USDC'])
         if 'authio' in kwargs and kwargs['authio']:
-            result = int((89 + 450) * NET_DECIMALS['DUC'])
+            result = int((89 + 450) * NET_DECIMALS['USDC'])
         return result
 
     def get_arguments(self, ducx_contract_attr_name):
