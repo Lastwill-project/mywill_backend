@@ -237,7 +237,7 @@ def i_am_alive(request):
 def cancel(request):
     contract = Contract.objects.get(id=request.data.get('id'))
     if contract.user != request.user or contract.state not in ('ACTIVE', 'EXPIRED') or contract.contract_type not in (
-    0, 1, 18):
+            0, 1, 18):
         raise PermissionDenied()
     queue = NETWORKS[contract.network.name]['queue']
     send_in_queue(contract.id, 'cancel', queue)
@@ -285,7 +285,8 @@ def get_coinmarketcap_statistics(id_list, convert_currency='USD'):
         data = response.text
         # print(data)
     except (
-    requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.TooManyRedirects) as e:
+            requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+            requests.exceptions.TooManyRedirects) as e:
         print(e)
         data = {'error': 'Exception in fetching coinmarketcap statistics'}
         return data
@@ -610,8 +611,8 @@ def get_cost_all_contracts(request):
     for i in contract_details_types:
         answer[i] = {
             'USDC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDC']),
-            'DUCX': str(int(
-                contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDC'] * convert('USDC', 'DUCX')['DUCX']))
+            'DUCX': str(
+                contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDC'] * convert('USDC', 'DUCX')['DUCX'])
         }
     return JsonResponse(answer)
 

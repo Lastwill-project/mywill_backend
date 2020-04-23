@@ -17,7 +17,7 @@ def convert(fsym, tsyms):
         amount = 1 / duc_usd_price
     elif fsym == 'USD' and tsyms == 'DUCX':
         amount = 1 / ducx_usd_price
-    elif fsym == 'USDС' and tsyms == 'DUCX':
+    elif fsym == 'USDC' and tsyms == 'DUCX':
         amount = 1 / ducx_usd_price
     elif fsym == 'DUC' and tsyms == 'USD':
         amount = duc_usd_price
