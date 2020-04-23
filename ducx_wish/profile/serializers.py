@@ -14,7 +14,7 @@ from rest_auth.serializers import (
 )
 
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
-from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL, ROOT_PUBLIC_KEY_DUCATUX, \
+from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL, ROOT_PUBLIC_KEY_DUCATUSX, \
     ROOT_PUBLIC_KEY_ETH
 from ducx_wish.profile.helpers import valid_totp
 from ducx_wish.profile.forms import SubSitePasswordResetForm
@@ -55,7 +55,7 @@ def init_profile(user, is_social=False, metamask_address=None, lang='en', swaps=
     memo_str = generate_memo(m)
 
     eth_key = BIP32Key.fromExtendedKey(ROOT_PUBLIC_KEY_ETH, public=True)
-    ducx_key = BIP32Key.fromExtendedKey(ROOT_PUBLIC_KEY_DUCATUX, public=True)
+    ducx_key = BIP32Key.fromExtendedKey(ROOT_PUBLIC_KEY_DUCATUSX, public=True)
     duc_root_key = DucatusWallet.deserialize(ROOT_PUBLIC_KEY_DUCATUS)
 
     eth_address = keys.PublicKey(eth_key.ChildKey(user.id).K.to_string()).to_checksum_address().lower()
