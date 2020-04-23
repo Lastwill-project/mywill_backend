@@ -30,7 +30,7 @@ from ducx_wish.consts import NET_DECIMALS
 from ducx_wish.profile.models import *
 from ducx_wish.payments.api import create_payment
 from exchange_API import convert
-from ducx_wish.consts import MAIL_NETWORK
+from ducx_wish.consts import MAIL_NETWORK, NET_DECIMALS
 import email_messages
 
 
@@ -146,9 +146,10 @@ class ContractSerializer(serializers.ModelSerializer):
             duc_cost = Contract.get_details_model(
                 contract.contract_type
             ).calc_cost(res['contract_details'], contract.network)
-        duc_cost = int(duc_cost)
+        usdc_cost = int(duc_cost)
         res['cost'] = {
-            'DUC': str(duc_cost),
+            'USDC': str(usdc_cost),
+            'DUCX': str(int(usdc_cost / NET_DECIMALS['USDC'] * convert('USDC', 'DUCX')['DUCX'] * NET_DECIMALS['DUCX']))
         }
         return res
 

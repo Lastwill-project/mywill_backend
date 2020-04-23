@@ -86,7 +86,8 @@ CONTRACT_GAS_LIMIT = {
 
 NET_DECIMALS = {
     'DUC': 10 ** 8,
-    'DUCX': 10 ** 18
+    'DUCX': 10 ** 18,
+    'USDC': 10 ** 6
 }
 
 TRON_REPLENISH_THRESHOLD = {
