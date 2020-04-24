@@ -59,7 +59,8 @@ class ContractViewSet(ModelViewSet):
         if self.request.user.is_staff:
             return result
         if self.request.user.profile.is_ducx_admin:
-            return result.filter(network__name='DUCATUSX_MAINNET')
+            contracts = result.filter(network__name='DUCATUSX_MAINNET').exclude(state__in=['CREATED'])
+            return contracts
         return result.filter(user=self.request.user)
 
 
