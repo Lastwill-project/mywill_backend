@@ -30,7 +30,7 @@ from ducx_wish.consts import NET_DECIMALS
 from ducx_wish.profile.models import *
 from ducx_wish.payments.api import create_payment
 from exchange_API import convert
-from ducx_wish.consts import MAIL_NETWORK, NET_DECIMALS
+from ducx_wish.consts import MAIL_NETWORK, NET_DECIMALS, BASE_CURRENCY
 import email_messages
 
 
@@ -146,10 +146,14 @@ class ContractSerializer(serializers.ModelSerializer):
             duc_cost = Contract.get_details_model(
                 contract.contract_type
             ).calc_cost(res['contract_details'], contract.network)
-        usdc_cost = int(duc_cost)
+        base_cost = int(duc_cost)
         res['cost'] = {
-            'USDC': str(usdc_cost),
-            'DUCX': str(int(usdc_cost / NET_DECIMALS['USDC'] * convert('USDC', 'DUCX')['DUCX'] * NET_DECIMALS['DUCX']))
+            'USDC': str(int(
+                base_cost / NET_DECIMALS[BASE_CURRENCY] * convert(BASE_CURRENCY, 'USDC')['USDC'] * NET_DECIMALS[
+                    'USDC'])),
+            'DUCX': str(int(
+                base_cost / NET_DECIMALS[BASE_CURRENCY] * convert(BASE_CURRENCY, 'DUCX')['DUCX'] * NET_DECIMALS[
+                    'DUCX']))
         }
         return res
 
@@ -342,8 +346,9 @@ class ContractDetailsICOSerializer(serializers.ModelSerializer):
 
     def validate(self, details):
         now = timezone.now().timestamp() + 600
-        if 'ducx_contract_token' in details and 'id' in details['ducx_contract_token'] and details['ducx_contract_token'][
-            'id']:
+        if 'ducx_contract_token' in details and 'id' in details['ducx_contract_token'] and \
+                details['ducx_contract_token'][
+                    'id']:
             token_model = DUCXContract.objects.get(id=details['ducx_contract_token']['id'])
             token_details = token_model.contract.get_details()
             details.pop('ducx_contract_token')
@@ -669,5 +674,3 @@ class ContractDetailsInvestmentPoolSerializer(serializers.ModelSerializer):
         kwargs = contract_details.copy()
         kwargs['contract'] = contract
         return super().update(details, kwargs)
-
-

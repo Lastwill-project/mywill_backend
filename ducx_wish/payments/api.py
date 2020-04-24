@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from ducx_wish.payments.models import InternalPayment
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
 from ducx_wish.settings import DUCATUSX_URL
-from ducx_wish.consts import NET_DECIMALS
+from ducx_wish.consts import NET_DECIMALS, BASE_CURRENCY
 from exchange_API import to_wish, convert
 
 
@@ -19,11 +19,11 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
     print('create payment')
     if not SubSite.objects.get(id=site_id).site_name == DUCATUSX_URL:
         raise Exception('Payment site is not ducatusx')
-    else:
-        value = amount
     user = User.objects.get(id=uid)
-    value = value if currency in ['USDC'] else value / NET_DECIMALS['DUCX'] * convert('DUCX', 'USDC')['USDC'] * \
-                                               NET_DECIMALS['USDC']
+    print('amount', amount, flush=True)
+    value = amount if currency == BASE_CURRENCY else amount / NET_DECIMALS[currency] * convert(currency, BASE_CURRENCY)[
+        BASE_CURRENCY] * NET_DECIMALS[BASE_CURRENCY]
+    print('value', value, flush=True)
     if amount < 0.0:
         # if site_id == 4 or site_id == 5:
         #     try:
@@ -48,8 +48,9 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
     ).save()
     print('PAYMENT: Created', flush=True)
     print(
-        'PAYMENT: Received {amount} {curr} ({usdc_value} WISH) from user {email}, id {user_id} with TXID: {txid} at site: {sitename}'
-        .format(amount=amount, curr=currency, usdc_value=value, email=user, user_id=uid, txid=tx, sitename=site_id),
+        'PAYMENT: Received {amount} {curr} ({value} {base_currency}) from user {email}, id {user_id} with TXID: {txid} at site: {sitename}'
+            .format(amount=amount, curr=currency, value=value, base_currency=BASE_CURRENCY, email=user, user_id=uid,
+                    txid=tx, sitename=site_id),
         flush=True)
 
 

@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 
 from ducx_wish.contracts.submodels.common import *
 from ducx_wish.settings import AUTHIO_EMAIL, SUPPORT_EMAIL
-from ducx_wish.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT
+from ducx_wish.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT, BASE_CURRENCY
 from email_messages import *
 
 
@@ -89,7 +89,7 @@ class ContractDetailsICO(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        return int(233 * NET_DECIMALS['USDC'])
+        return int(233 * NET_DECIMALS[BASE_CURRENCY])
 
     def compile(self, ducx_contract_attr_name='ducx_contract_token'):
         print('ico_contract compile')
@@ -360,9 +360,9 @@ class ContractDetailsToken(CommonDetails):
     def calc_cost(kwargs, network):
         if NETWORKS[network.name]['is_free']:
             return 0
-        result = int(89 * NET_DECIMALS['USDC'])
+        result = int(89 * NET_DECIMALS[BASE_CURRENCY])
         if 'authio' in kwargs and kwargs['authio']:
-            result = int((89 + 450) * NET_DECIMALS['USDC'])
+            result = int((89 + 450) * NET_DECIMALS[BASE_CURRENCY])
         return result
 
     def get_arguments(self, ducx_contract_attr_name):

@@ -610,9 +610,10 @@ def get_cost_all_contracts(request):
     contract_details_types = Contract.get_all_details_model()
     for i in contract_details_types:
         answer[i] = {
-            'USDC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDC']),
-            'DUCX': str(
-                contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDC'] * convert('USDC', 'DUCX')['DUCX'])
+            'USDC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS[BASE_CURRENCY] *
+                        convert(BASE_CURRENCY, 'USDC')['USDC']),
+            'DUCX': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS[BASE_CURRENCY] *
+                        convert(BASE_CURRENCY, 'DUCX')['DUCX'])
         }
     return JsonResponse(answer)
 
