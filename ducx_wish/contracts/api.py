@@ -140,7 +140,7 @@ def deploy(request):
                 return Response('ok')
 
     cost = contract.cost
-    currency = 'DUC'
+    currency = BASE_CURRENCY
     site_id = 1
     network = contract.network.name
     create_payment(contract.user.id, '', currency, -cost, site_id, network)

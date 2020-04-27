@@ -14,8 +14,7 @@ from rest_auth.serializers import (
 )
 
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
-from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL, ROOT_PUBLIC_KEY_DUCATUSX, \
-    ROOT_PUBLIC_KEY_ETH
+from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL, ROOT_PUBLIC_KEY_ETH
 from ducx_wish.profile.helpers import valid_totp
 from ducx_wish.profile.forms import SubSitePasswordResetForm
 from ducx_wish.bip32_ducatus import DucatusWallet
