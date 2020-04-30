@@ -495,7 +495,7 @@ class ContractDetailsTokenSerializer(serializers.ModelSerializer):
             raise ValidationError
         if '"' in details['token_short_name'] or '\n' in details['token_short_name']:
             raise ValidationError
-        if not (0 <= details['decimals'] <= 50):
+        if not (0 <= details['decimals'] <= 8):
             raise ValidationError
         for th in details['token_holders']:
             th['amount'] = int(th['amount'])
