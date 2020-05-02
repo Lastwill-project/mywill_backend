@@ -32,6 +32,7 @@ class UserSiteBalance(models.Model):
     subsite = models.ForeignKey(SubSite)
     balance = models.DecimalField(max_digits=MAX_WEI_DIGITS, decimal_places=0, default=0)
     duc_address = models.CharField(max_length=50, null=True, default=None)
+    eth_address = models.CharField(max_length=50, null=True, default=None)
     memo = models.CharField(max_length=25, null=True, default=None, unique=True)
 
 

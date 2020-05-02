@@ -5,7 +5,7 @@ from binance.client import Client
 
 
 def convert(fsym, tsyms):
-    allowed = {'USD', 'DUC', 'DUCX'}
+    allowed = {'USD', 'DUC', 'DUCX', 'USDC'}
 
     if fsym not in allowed or any([x not in allowed for x in tsyms.split(',')]):
         raise Exception('currency not allowed')
@@ -17,9 +17,13 @@ def convert(fsym, tsyms):
         amount = 1 / duc_usd_price
     elif fsym == 'USD' and tsyms == 'DUCX':
         amount = 1 / ducx_usd_price
+    elif fsym == 'USDC' and tsyms == 'DUCX':
+        amount = 1 / ducx_usd_price
     elif fsym == 'DUC' and tsyms == 'USD':
         amount = duc_usd_price
     elif fsym == 'DUCX' and tsyms == 'USD':
+        amount = ducx_usd_price
+    elif fsym == 'DUCX' and tsyms == 'USDC':
         amount = ducx_usd_price
     elif fsym == 'DUC' and tsyms == 'DUCX':
         amount = duc_usd_price / ducx_usd_price

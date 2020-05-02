@@ -10,11 +10,11 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import serializers
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.serializers import (
-    LoginSerializer, PasswordChangeSerializer, PasswordResetConfirmSerializer,PasswordResetSerializer
+    LoginSerializer, PasswordChangeSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer
 )
 
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
-from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL
+from ducx_wish.settings import ROOT_PUBLIC_KEY_DUCATUS, BITCOIN_URLS, DUCATUSX_URL, ROOT_PUBLIC_KEY_ETH
 from ducx_wish.profile.helpers import valid_totp
 from ducx_wish.profile.forms import SubSitePasswordResetForm
 from ducx_wish.bip32_ducatus import DucatusWallet
@@ -38,11 +38,12 @@ def registration_btc_address(btc_address):
     )
 
 
-def create_wish_balance(user, duc_address, memo_str):
+def create_wish_balance(user, duc_address, eth_address, memo_str):
     ducxwish = SubSite.objects.get(site_name=DUCATUSX_URL)
     UserSiteBalance(
         user=user, subsite=ducxwish,
         duc_address=duc_address,
+        eth_address=eth_address,
         memo=memo_str
     ).save()
 
@@ -51,11 +52,14 @@ def init_profile(user, is_social=False, metamask_address=None, lang='en', swaps=
     m = hashlib.sha256()
     memo_str = generate_memo(m)
 
+    eth_key = BIP32Key.fromExtendedKey(ROOT_PUBLIC_KEY_ETH, public=True)
     duc_root_key = DucatusWallet.deserialize(ROOT_PUBLIC_KEY_DUCATUS)
+
+    eth_address = keys.PublicKey(eth_key.ChildKey(user.id).K.to_string()).to_checksum_address().lower()
     duc_address = duc_root_key.get_child(user.id, is_prime=False).to_address()
 
     Profile(user=user, is_social=is_social, metamask_address=metamask_address, lang=lang, is_swaps=swaps).save()
-    create_wish_balance(user, duc_address, memo_str)
+    create_wish_balance(user, duc_address, eth_address, memo_str)
     # registration_btc_address()
 
 

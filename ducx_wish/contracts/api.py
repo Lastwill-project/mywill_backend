@@ -19,8 +19,8 @@ from ducx_wish.settings import BASE_DIR, ETHERSCAN_API_KEY, COINMARKETCAP_API_KE
 from ducx_wish.settings import DUCATUSX_URL, EMAIL_HOST_USER, DUCATUSX_CONFIRM_EMAIL, DEFAULT_FROM_EMAIL
 from ducx_wish.permissions import IsOwner, IsStaff, IsDucXAdmin
 from ducx_wish.profile.models import Profile
-from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue,\
-    ContractDetailsInvestmentPool, InvestAddress,  CurrencyStatisticsCache
+from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue, \
+    ContractDetailsInvestmentPool, InvestAddress, CurrencyStatisticsCache
 from ducx_wish.deploy.models import Network
 from ducx_wish.payments.api import create_payment
 from exchange_API import to_wish, convert
@@ -86,29 +86,32 @@ def get_token_contracts(request):
         return Response([])
     res = []
     ducx_contracts = DUCXContract.objects.filter(
-             contract__contract_type__in=(4, 5),
-             contract__user=request.user,
-             address__isnull=False,
-             contract__network=request.query_params['network'],
+        contract__contract_type__in=(4, 5),
+        contract__user=request.user,
+        address__isnull=False,
+        contract__network=request.query_params['network'],
     )
     for ec in ducx_contracts:
         details = ec.contract.get_details()
         if details.ducx_contract_token == ec:
-            if any([x.contract.contract_type == 4 and x.contract.state not in ('CREATED', 'ENDED') for x in ec.ico_details_token.all()]):
+            if any([x.contract.contract_type == 4 and x.contract.state not in ('CREATED', 'ENDED') for x in
+                    ec.ico_details_token.all()]):
                 state = 'running'
-            elif any([x.contract.contract_type == 4 and not x.continue_minting and x.contract.state =='ENDED' for x in ec.ico_details_token.all()]):
+            elif any([x.contract.contract_type == 4 and not x.continue_minting and x.contract.state == 'ENDED' for x in
+                      ec.ico_details_token.all()]):
                 state = 'closed'
-            elif any([x.contract.contract_type == 5 and x.contract.state == 'ENDED' for x in ec.token_details_token.all()]):
+            elif any([x.contract.contract_type == 5 and x.contract.state == 'ENDED' for x in
+                      ec.token_details_token.all()]):
                 state = 'closed'
             else:
                 state = 'ok'
             res.append({
-                    'id': ec.id,
-                    'address': ec.address,
-                    'token_name': details.token_name,
-                    'token_short_name': details.token_short_name,
-                    'decimals': details.decimals,
-                    'state': state
+                'id': ec.id,
+                'address': ec.address,
+                'token_name': details.token_name,
+                'token_short_name': details.token_short_name,
+                'decimals': details.decimals,
+                'state': state
             })
     return Response(res)
 
@@ -138,7 +141,7 @@ def deploy(request):
                 return Response('ok')
 
     cost = contract.cost
-    currency = 'DUC'
+    currency = BASE_CURRENCY
     site_id = 1
     network = contract.network.name
     create_payment(contract.user.id, '', currency, -cost, site_id, network)
@@ -234,7 +237,8 @@ def i_am_alive(request):
 @api_view(http_method_names=['POST'])
 def cancel(request):
     contract = Contract.objects.get(id=request.data.get('id'))
-    if contract.user != request.user or contract.state not in ('ACTIVE', 'EXPIRED') or contract.contract_type not in (0, 1, 18):
+    if contract.user != request.user or contract.state not in ('ACTIVE', 'EXPIRED') or contract.contract_type not in (
+            0, 1, 18):
         raise PermissionDenied()
     queue = NETWORKS[contract.network.name]['queue']
     send_in_queue(contract.id, 'cancel', queue)
@@ -244,7 +248,6 @@ def cancel(request):
 class ICOtokensView(View):
 
     def get(self, request, *args, **kwargs):
-
         address = request.GET.get('address', None)
         if not DUCXContract.objects.filter(address=address):
             raise PermissionDenied
@@ -282,7 +285,9 @@ def get_coinmarketcap_statistics(id_list, convert_currency='USD'):
         response = session.get(URL_STATS_CURRENCY['CoinMarketCap'], params=parameters)
         data = response.text
         # print(data)
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.TooManyRedirects) as e:
+    except (
+            requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+            requests.exceptions.TooManyRedirects) as e:
         print(e)
         data = {'error': 'Exception in fetching coinmarketcap statistics'}
         return data
@@ -403,13 +408,18 @@ def get_balances_statistics():
         if curr['asset'] == 'NEO':
             neo_balance = curr['amount']
     eth_account_balance = float(json.loads(requests.get(url=
-        URL_STATS_BALANCE['ETH'] + '{address}&tag=latest&apikey={api_key}'.format(
-            address=ETH_MAINNET_ADDRESS,api_key=ETHERSCAN_API_KEY),
-        headers=BROWSER_HEADERS).content.decode())['result']) / NET_DECIMALS['ETH']
+                                                        URL_STATS_BALANCE[
+                                                            'ETH'] + '{address}&tag=latest&apikey={api_key}'.format(
+                                                            address=ETH_MAINNET_ADDRESS, api_key=ETHERSCAN_API_KEY),
+                                                        headers=BROWSER_HEADERS).content.decode())['result']) / \
+                          NET_DECIMALS['ETH']
     eth_test_account_balance = float(json.loads(requests.get(url=
-        URL_STATS_BALANCE['ETH_ROPSTEN'] + '{address}&tag=latest&apikey={api_key}'.format(
-            address=ETH_TESTNET_ADDRESS, api_key=ETHERSCAN_API_KEY),
-        headers=BROWSER_HEADERS).content.decode())['result']) / NET_DECIMALS['ETH']
+                                                             URL_STATS_BALANCE[
+                                                                 'ETH_ROPSTEN'] + '{address}&tag=latest&apikey={api_key}'.format(
+                                                                 address=ETH_TESTNET_ADDRESS,
+                                                                 api_key=ETHERSCAN_API_KEY),
+                                                             headers=BROWSER_HEADERS).content.decode())['result']) / \
+                               NET_DECIMALS['ETH']
 
     eos_test_account_balance = 0
     eos_cpu_test_builder = 0
@@ -420,18 +430,18 @@ def get_balances_statistics():
     eos_ram_builder = 0
     eos_account_balance = 0
     return {
-    'eth_account_balance': eth_account_balance,
-    'eth_test_account_balance': eth_test_account_balance,
-    'eos_account_balance':  eos_account_balance,
-    'eos_test_account_balance': eos_test_account_balance,
-    'eos_cpu_test_builder': eos_cpu_test_builder,
-    'eos_net_test_builder': eos_net_test_builder,
-    'eos_ram_test_builder': eos_ram_test_builder,
-    'eos_cpu_builder': eos_cpu_builder,
-    'eos_net_builder': eos_net_builder,
-    'eos_ram_builder': eos_ram_builder,
-    'neo_test_balance': neo_balance,
-    'gas_test_balance': gas_balance
+        'eth_account_balance': eth_account_balance,
+        'eth_test_account_balance': eth_test_account_balance,
+        'eos_account_balance': eos_account_balance,
+        'eos_test_account_balance': eos_test_account_balance,
+        'eos_cpu_test_builder': eos_cpu_test_builder,
+        'eos_net_test_builder': eos_net_test_builder,
+        'eos_ram_test_builder': eos_ram_test_builder,
+        'eos_cpu_builder': eos_cpu_builder,
+        'eos_net_builder': eos_net_builder,
+        'eos_ram_builder': eos_ram_builder,
+        'neo_test_balance': neo_balance,
+        'gas_test_balance': gas_balance
     }
 
 
@@ -486,13 +496,13 @@ def get_contracts_for_network(net, all_contracts, now, day):
         'now_error': len(now_error),
         'launch': len(in_progress),
         'now_launch': len(now_in_progress)
-        }
+    }
     contract_details_types = Contract.get_all_details_model()
     for ctype in contract_details_types:
-        answer['contract_type_'+str(ctype)] = contracts.filter(
+        answer['contract_type_' + str(ctype)] = contracts.filter(
             contract_type=ctype
         ).count()
-        answer['contract_type_'+str(ctype)+'_new'] = contracts.filter(
+        answer['contract_type_' + str(ctype) + '_new'] = contracts.filter(
             contract_type=ctype
         ).filter(created_date__lte=now, created_date__gte=day).count()
     return answer
@@ -501,7 +511,6 @@ def get_contracts_for_network(net, all_contracts, now, day):
 @api_view(http_method_names=['GET'])
 # @permission_classes((permissions.IsAdminUser,))
 def get_statistics(request):
-
     now = datetime.datetime.now()
     day = datetime.datetime.combine(
         datetime.datetime.now().today(),
@@ -601,8 +610,11 @@ def get_cost_all_contracts(request):
     answer = {}
     contract_details_types = Contract.get_all_details_model()
     for i in contract_details_types:
-        answer[i] ={
-            'DUC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['DUC']),
+        answer[i] = {
+            'USDC': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS[BASE_CURRENCY] *
+                        convert(BASE_CURRENCY, 'USDC')['USDC']),
+            'DUCX': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS[BASE_CURRENCY] *
+                        convert(BASE_CURRENCY, 'DUCX')['DUCX'])
         }
     return JsonResponse(answer)
 
@@ -691,9 +703,9 @@ def load_airdrop(request):
                     if not x['address'].startswith('41'):
                         x['address'] = convert_airdrop_address_to_hex(x['address'])
         AirdropAddress.objects.bulk_create([AirdropAddress(
-                contract=contract,
-                address=x['address'] if contract.network.name in ['TRON_MAINNET', 'TRON_TESTNET'] else x['address'].lower() ,
-                amount=x['amount']
+            contract=contract,
+            address=x['address'] if contract.network.name in ['TRON_MAINNET', 'TRON_TESTNET'] else x['address'].lower(),
+            amount=x['amount']
         ) for x in addresses])
     else:
         if contract.eosairdropaddress_set.filter(state__in=('processing', 'sent')).count():
@@ -701,9 +713,9 @@ def load_airdrop(request):
         contract.eosairdropaddress_set.all().delete()
         addresses = request.data.get('addresses')
         EOSAirdropAddress.objects.bulk_create([EOSAirdropAddress(
-                contract=contract,
-                address=x['address'].lower(),
-                amount=x['amount']
+            contract=contract,
+            address=x['address'].lower(),
+            amount=x['amount']
         ) for x in addresses])
     return JsonResponse({'result': 'ok'})
 
@@ -763,14 +775,15 @@ def check_status(request):
         command = ['cleos', '-u', 'https://%s:%s' % (host, port), 'get', 'table',
                    addr, addr, 'state']
     else:
-        command = ['cleos', '-u', 'http://%s:%s' % (host,port), 'get', 'table', addr, addr, 'state']
+        command = ['cleos', '-u', 'http://%s:%s' % (host, port), 'get', 'table', addr, addr, 'state']
     stdout, stderr = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE).communicate()
     if stdout:
         result = json.loads(stdout.decode())['rows'][0]
         if now > result['finish'] and int(result['total_tokens']) < details.soft_cap:
             contract.state = 'CANCELLED'
             contract.save()
-        elif details.is_transferable_at_once and now > result['finish'] and int(result['total_tokens']) >= details.soft_cap:
+        elif details.is_transferable_at_once and now > result['finish'] and int(
+                result['total_tokens']) >= details.soft_cap:
             contract.state = 'DONE'
             contract.save()
         elif details.is_transferable_at_once and int(result['total_tokens']) >= details.hard_cap:
@@ -786,18 +799,19 @@ def send_authio_info(contract, details, authio_email):
         mint_info = mint_info + '\n' + th.address + '\n'
         mint_info = mint_info + str(th.amount) + '\n'
         if th.freeze_date:
-            mint_info = mint_info + str(datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
+            mint_info = mint_info + str(
+                datetime.datetime.utcfromtimestamp(th.freeze_date).strftime('%Y-%m-%d %H:%M:%S')) + '\n'
     EmailMessage(
         subject=authio_subject,
         body=authio_message.format(
-        address=details.ducx_contract_token.address,
-        email=authio_email,
-        token_name=details.token_name,
-        token_short_name=details.token_short_name,
-        token_type=details.token_type,
-        decimals=details.decimals,
-        mint_info=mint_info if mint_info else 'No',
-        admin_address=details.admin_address
+            address=details.ducx_contract_token.address,
+            email=authio_email,
+            token_name=details.token_name,
+            token_short_name=details.token_short_name,
+            token_type=details.token_type,
+            decimals=details.decimals,
+            mint_info=mint_info if mint_info else 'No',
+            admin_address=details.admin_address
         ),
         from_email=DEFAULT_FROM_EMAIL,
         to=[AUTHIO_EMAIL, SUPPORT_EMAIL]
@@ -830,7 +844,7 @@ def buy_brand_report(request):
     create_payment(request.user.id, '', currency, -cost, site_id, net)
     details.authio_date_payment = datetime.datetime.now().date()
     details.authio_date_getting = details.authio_date_payment + datetime.timedelta(
-            days=3)
+        days=3)
     details.authio_email = authio_email
     details.authio = True
     details.save()
@@ -841,7 +855,7 @@ def buy_brand_report(request):
 @api_view(http_method_names=['GET'])
 def get_authio_cost(request):
     duc_cost = str(450 * NET_DECIMALS['DUC'])
-    return JsonResponse({'DUC': duc_cost })
+    return JsonResponse({'DUC': duc_cost})
 
 
 @api_view(http_method_names=['GET'])
@@ -885,16 +899,14 @@ def get_tokens_for_eth_address(request):
             result.append(
                 {
                     'tokenInfo':
-                     {
-                         'address': details.ducx_contract_token.address,
-                         'decimals': details.decimals,
-                         'symbol': details.token_short_name,
-                         'name': details.token_name,
-                         'owner': details.admin_address
-                     },
+                        {
+                            'address': details.ducx_contract_token.address,
+                            'decimals': details.decimals,
+                            'symbol': details.token_short_name,
+                            'name': details.token_name,
+                            'owner': details.admin_address
+                        },
                     'balance': 0
                 }
             )
     return Response(result)
-
-

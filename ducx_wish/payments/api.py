@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 from ducx_wish.payments.models import InternalPayment
 from ducx_wish.profile.models import Profile, UserSiteBalance, SubSite
 from ducx_wish.settings import DUCATUSX_URL
-from ducx_wish.consts import NET_DECIMALS
+from ducx_wish.consts import NET_DECIMALS, BASE_CURRENCY
 from exchange_API import to_wish, convert
 
 
@@ -18,10 +18,12 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
         return
     print('create payment')
     if not SubSite.objects.get(id=site_id).site_name == DUCATUSX_URL:
-         raise Exception('Payment site is not ducatusx')
-    else:
-        value = amount
+        raise Exception('Payment site is not ducatusx')
     user = User.objects.get(id=uid)
+    print('amount', amount, flush=True)
+    value = amount if currency == BASE_CURRENCY else amount / NET_DECIMALS[currency] * convert(currency, BASE_CURRENCY)[
+        BASE_CURRENCY] * NET_DECIMALS[BASE_CURRENCY]
+    print('value', value, flush=True)
     if amount < 0.0:
         # if site_id == 4 or site_id == 5:
         #     try:
@@ -45,9 +47,11 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
         site=site
     ).save()
     print('PAYMENT: Created', flush=True)
-    print('PAYMENT: Received {amount} {curr} ({wish_value} WISH) from user {email}, id {user_id} with TXID: {txid} at site: {sitename}'
-          .format(amount=amount, curr=currency, wish_value=value, email=user, user_id=uid, txid=tx, sitename=site_id),
-          flush=True)
+    print(
+        'PAYMENT: Received {amount} {curr} ({value} {base_currency}) from user {email}, id {user_id} with TXID: {txid} at site: {sitename}'
+            .format(amount=amount, curr=currency, value=value, base_currency=BASE_CURRENCY, email=user, user_id=uid,
+                    txid=tx, sitename=site_id),
+        flush=True)
 
 
 def calculate_decimals(currency, amount):
@@ -72,12 +76,10 @@ def add_decimals(currency, amount):
     return amount
 
 
-
-
 def positive_payment(user, value, site_id, currency, amount):
     UserSiteBalance.objects.select_for_update().filter(
         user=user, subsite__id=site_id).update(
-            balance=F('balance') + value)
+        balance=F('balance') + value)
     print('positive payment ok', flush=True)
 
 
@@ -95,16 +97,17 @@ def get_payment_statistics(start, stop=None):
     payments = InternalPayment.objects.filter(
         delta__gte=0, datetime__gte=start, datetime__lte=stop
     ).order_by('datetime')
-    total_payments = {'ETH': 0.0, 'WISH': 0.0, 'BTC': 0.0, 'BNB': 0.0, 'EOS': 0.0, 'EOSISH': 0.0, 'TRX': 0.0, 'TRONISH': 0.0, 'BWISH': 0.0, 'SWAP': 0.0}
+    total_payments = {'ETH': 0.0, 'WISH': 0.0, 'BTC': 0.0, 'BNB': 0.0, 'EOS': 0.0, 'EOSISH': 0.0, 'TRX': 0.0,
+                      'TRONISH': 0.0, 'BWISH': 0.0, 'SWAP': 0.0}
     for pay in payments:
         print(
             pay.datetime.date(),
             pay.user.id, pay.user.email,
-            float(pay.original_delta)/NET_DECIMALS[pay.original_currency],
+            float(pay.original_delta) / NET_DECIMALS[pay.original_currency],
             pay.original_currency,
             'site id', pay.site.id,
             flush=True
         )
-        total_payments[pay.original_currency] += float(pay.original_delta)/NET_DECIMALS[pay.original_currency]
+        total_payments[pay.original_currency] += float(pay.original_delta) / NET_DECIMALS[pay.original_currency]
 
     print('total_payments', total_payments, flush=True)
