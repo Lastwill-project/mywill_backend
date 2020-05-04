@@ -22,7 +22,7 @@ from ducx_wish.profile.models import Profile
 from ducx_wish.contracts.models import Contract, WhitelistAddress, AirdropAddress, DUCXContract, send_in_queue, \
     ContractDetailsInvestmentPool, InvestAddress, CurrencyStatisticsCache
 from ducx_wish.deploy.models import Network
-from ducx_wish.payments.api import create_payment
+from ducx_wish.payments.api import create_payment, freeze_balance, unfreeze_balance
 from exchange_API import to_wish, convert
 from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message, \
     ducatus_admin_confirm_subject, ducatus_admin_confirm_ico_text, ducatus_admin_confirm_token_text
@@ -129,20 +129,22 @@ def deploy(request):
     if contract.state not in ('CREATED', 'WAITING_FOR_PAYMENT', 'WAITING_FOR_CONFIRMATION'):
         raise PermissionDenied
 
+    cost = contract.cost
+    site_id = 1
+
     if contract.network.name == 'DUCATUSX_MAINNET':
         if contract.user == request.user:
             if contract.state == 'WAITING_FOR_CONFIRMATION':
                 print('already sent to confirmation', flush=True)
                 return Response('ok')
             else:
+                freeze_balance(contract.user, cost, site_id)
                 send_to_ducatus_admin(contract, request)
                 contract.state = 'WAITING_FOR_CONFIRMATION'
                 contract.save()
                 return Response('ok')
 
-    cost = contract.cost
     currency = BASE_CURRENCY
-    site_id = 1
     network = contract.network.name
     create_payment(contract.user.id, '', currency, -cost, site_id, network)
     contract.state = 'WAITING_FOR_DEPLOYMENT'
@@ -210,6 +212,9 @@ def cancel_ducatusx_contract(request):
 
     if not request.user.profile.is_ducx_admin:
         raise PermissionDenied
+
+    site_id = 1
+    unfreeze_balance(contract.user, contract.cost, site_id)
 
     contract.state = 'CANCELLED'
     contract.save()

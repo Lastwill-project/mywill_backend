@@ -34,6 +34,7 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
         #         negative_payment(user, -value, site_id, network)
         # else:
         #     negative_payment(user, -value, site_id, network)
+        unfreeze_balance(user, value, site_id)
         negative_payment(user, -value, site_id, network)
     else:
         positive_payment(user, value, site_id, currency, amount)
@@ -89,6 +90,22 @@ def negative_payment(user, value, site_id, network):
     ).update(balance=F('balance') - value):
         raise ValidationError({'result': 3}, code=400)
     print('negative payment ok', flush=True)
+
+
+def freeze_balance(user, value, site_id):
+    if not UserSiteBalance.objects.select_for_update().filter(
+            user=user, subsite__id=site_id, balance__gte=value
+    ).update(balance=F('balance') - value, frozen_balance=F('frozen_balance') + value):
+        raise ValidationError({'result': 3}, code=400)
+    print('freeze balance ok', flush=True)
+
+
+def unfreeze_balance(user, value, site_id):
+    if not UserSiteBalance.objects.select_for_update().filter(
+            user=user, subsite__id=site_id, frozen_balance__gte=value
+    ).update(balance=F('balance') + value, frozen_balance=F('frozen_balance') - value):
+        raise ValidationError({'result': 3}, code=400)
+    print('unfreeze balance ok', flush=True)
 
 
 def get_payment_statistics(start, stop=None):
