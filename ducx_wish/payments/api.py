@@ -34,7 +34,7 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
         #         negative_payment(user, -value, site_id, network)
         # else:
         #     negative_payment(user, -value, site_id, network)
-        unfreeze_balance(user, value, site_id)
+        unfreeze_balance(user, -value, site_id)
         negative_payment(user, -value, site_id, network)
     else:
         positive_payment(user, value, site_id, currency, amount)
