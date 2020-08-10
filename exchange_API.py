@@ -1,7 +1,10 @@
 import requests
 import json
 import time
+
 from binance.client import Client
+
+from ducx_wish.settings import RATES_API_URL
 
 
 def convert(fsym, tsyms):
@@ -10,8 +13,8 @@ def convert(fsym, tsyms):
     if fsym not in allowed or any([x not in allowed for x in tsyms.split(',')]):
         raise Exception('currency not allowed')
 
-    duc_usd_price = 0.06
-    ducx_usd_price = 0.5
+    duc_usd_price = json.loads(requests.get(RATES_API_URL.format(fsym='DUC', tsyms='USD')).content).get('USD')
+    ducx_usd_price = json.loads(requests.get(RATES_API_URL.format(fsym='DUCX', tsyms='USD')).content).get('USD')
 
     if fsym == 'USD' and tsyms == 'DUC':
         amount = 1 / duc_usd_price
