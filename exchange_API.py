@@ -10,7 +10,7 @@ def convert(fsym, tsyms):
     if fsym not in allowed or any([x not in allowed for x in tsyms.split(',')]):
         raise Exception('currency not allowed')
 
-    duc_usd_price = 0.05
+    duc_usd_price = 0.06
     ducx_usd_price = 0.5
 
     if fsym == 'USD' and tsyms == 'DUC':
