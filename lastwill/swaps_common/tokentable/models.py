@@ -21,6 +21,9 @@ class TokensCoinMarketCap(models.Model):
     token_price = models.CharField(max_length=100, null=True, default=None)
     updated_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('id', 'token_name', 'token_short_name')
+
 
 class TokensUpdateTime(models.Model):
     last_time_updated = models.DateTimeField(auto_now_add=True)
