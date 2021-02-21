@@ -283,8 +283,8 @@ urlpatterns = [
     url(r'^api/admin_delete_swap3/$', admin_delete_swaps_v3),
     url(r'^api/get_cmc_token_rate', get_coins_rate),
     url(r'^api/get_all_promos/$', get_all_promos_api),
-    url(r'^api/create_order_unique_link/$', generate_new_order_unique_link),
-    url(r'^api/create_order_memo/$', generate_new_order_memo),
+    url(r'^api/generate_order_unique_link/$', generate_new_order_unique_link),
+    url(r'^api/generate_order_memo/$', generate_new_order_memo),
 
     #panama_bridge
     url(r'^api/bridge/transactions', UserTransactionsView.as_view()),
