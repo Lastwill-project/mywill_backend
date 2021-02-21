@@ -123,6 +123,8 @@ from lastwill.swaps_common.orderbook.api import (
     create_contract_swaps_backend,
     delete_swaps_v3,
     edit_contract_swaps_backend,
+    generate_new_order_memo,
+    generate_new_order_unique_link,
     get_non_active_orders,
     get_swap_v3_for_unique_link,
     get_swap_v3_public,
@@ -281,6 +283,8 @@ urlpatterns = [
     url(r'^api/admin_delete_swap3/$', admin_delete_swaps_v3),
     url(r'^api/get_cmc_token_rate', get_coins_rate),
     url(r'^api/get_all_promos/$', get_all_promos_api),
+    url(r'^api/create_order_unique_link/$', generate_new_order_unique_link),
+    url(r'^api/create_order_memo/$', generate_new_order_memo),
 
     #panama_bridge
     url(r'^api/bridge/transactions', UserTransactionsView.as_view()),

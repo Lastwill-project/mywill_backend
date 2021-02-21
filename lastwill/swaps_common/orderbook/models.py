@@ -1,6 +1,6 @@
 from datetime import datetime
-import random
-from string import ascii_lowercase, digits
+# import random
+# from string import ascii_lowercase, digits
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -14,22 +14,22 @@ from lastwill.consts import MAX_WEI_DIGITS
 from lastwill.settings import SITE_PROTOCOL, SWAPS_URL
 
 
-def _get_memo():
-    """
-        Возвращает случайно сгенерированную строку хэша.
-    """
-    return '0x' + ''.join(
-        random.choice('abcdef'.join(digits)) for _ in range(64)
-    )
+# def _get_memo():
+#     """
+#         Возвращает случайно сгенерированную строку хэша.
+#     """
+#     return '0x' + ''.join(
+#         random.choice('abcdef'.join(digits)) for _ in range(64)
+#     )
 
 
-def _get_unique_link():
-    """
-        Возвращает случайно сгенерированную строку.
-    """
-    return ''.join(
-        random.choice(ascii_lowercase.join(digits)) for _ in range(6)
-    )
+# def _get_unique_link():
+#     """
+#         Возвращает случайно сгенерированную строку.
+#     """
+#     return ''.join(
+#         random.choice(ascii_lowercase.join(digits)) for _ in range(6)
+#     )
 
 
 class OrderBookSwaps(models.Model):
@@ -40,8 +40,9 @@ class OrderBookSwaps(models.Model):
     )
     memo_contract = models.CharField(
         max_length=70,
+        unique=True,
         # null=True,
-        default=_get_memo
+        # default=_get_memo
     )
     network = models.ForeignKey(
         Network,
@@ -138,8 +139,9 @@ class OrderBookSwaps(models.Model):
     public = models.BooleanField(default=True)
     unique_link = models.CharField(
         max_length=50,
+        unique=True,
         # null=True,
-        default=_get_unique_link
+        # default=_get_unique_link
     )
     created_date = models.DateTimeField(auto_now_add=True)
     stop_date = models.DateTimeField(default=timezone.now)
@@ -162,8 +164,8 @@ class OrderBookSwaps(models.Model):
         default=''
     )
     comment = models.TextField(default='')
-    is_rubic_order = models.BooleanField(default=False)
-    rubic_initialized = models.BooleanField(default=False)
+    is_rubic_order = models.BooleanField(default=True)
+    rubic_initialized = models.BooleanField(default=True)
 
     @check_transaction
     def msg_deployed(self, message):

@@ -1,17 +1,20 @@
 import datetime
-import random
-import string
+# import random
+# import string
 
 from django.utils import timezone
 from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied, ParseError, NotFound
 from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
-from lastwill.contracts.submodels.common import Contract, send_in_queue
-from lastwill.swaps_common.orderbook.models import OrderBookSwaps
+from lastwill.contracts.submodels.common import Contract
 from lastwill.swaps_common.mailing.models import SwapsNotificationDefaults
-from lastwill.settings import SWAPS_ORDERBOOK_QUEUE, RUBIC_EXC_URL
+from lastwill.settings import RUBIC_EXC_URL
+
+from .models import OrderBookSwaps
+from .utils import _get_unique_link, _get_memo
 
 EXCLUDED_STATES = ['DONE', 'CANCELLED', 'POSTPONED']
 
@@ -72,6 +75,32 @@ def get_swap_from_orderbook(swap_id):
     return saved_details
 
 
+@api_view(http_method_names=['GET',])
+def generate_new_order_unique_link(request):
+    """
+        Returns a randomly generated link for a new order.
+    """
+    return Response(
+        data={
+            'unique_link': _get_unique_link(),
+        },
+        status=HTTP_200_OK,
+    )
+
+
+@api_view(http_method_names=['GET',])
+def generate_new_order_memo(request):
+    """
+        Returns a randomly generated memo for a new order.
+    """
+    return Response(
+        data={
+            'memo': _get_memo(),
+        },
+        status=HTTP_200_OK,
+    )
+
+
 @api_view(http_method_names=['POST'])
 def create_contract_swaps_backend(request):
     if request.user.is_anonymous:
@@ -95,13 +124,15 @@ def create_contract_swaps_backend(request):
     broker_fee = contract_details['broker_fee'] if 'broker_fee' in contract_details else False
     comment = contract_details['comment'] if 'comment' in contract_details else ""
 
-    link = ''.join(
-            random.choice(string.ascii_lowercase + string.digits) for _ in
-            range(6)
-        )
+    # link = ''.join(
+    #         random.choice(string.ascii_lowercase + string.digits) for _ in
+    #         range(6)
+    #     )
 
-    memo = '0x' + ''.join(random.choice('abcdef' + string.digits) for _ in range(64))
+    # memo = '0x' + ''.join(random.choice('abcdef' + string.digits) for _ in range(64))
 
+    unique_link = contract_details['unique_link']
+    memo = contract_details['memo']
     min_base_wei = contract_details['min_base_wei'] if 'min_base_wei' in contract_details else ""
     min_quote_wei = contract_details['min_quote_wei'] if 'min_quote_wei' in contract_details else ""
     whitelist = contract_details['whitelist'] if 'whitelist' in contract_details else False
@@ -145,7 +176,7 @@ def create_contract_swaps_backend(request):
             owner_address=owner_address.lower(),
             stop_date=stop_date_conv,
             public=contract_details['public'],
-            unique_link=link,
+            unique_link=unique_link,
             user=request.user,
             broker_fee=broker_fee,
             memo_contract=memo,
