@@ -55,6 +55,7 @@ class CoinGeckoToken(models.Model):
     """
     title = models.CharField(max_length=255)
     short_title = models.CharField(max_length=255)
+    coingecko_id = models.CharField(max_length=255)
     platform = models.CharField(
         max_length=255,
         default='',

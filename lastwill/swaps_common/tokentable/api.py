@@ -266,6 +266,7 @@ def get_actual_coingecko_tokens(request):
             token_list.append({
                 'token_title': token.title,
                 'token_short_title': token.short_title.upper(),
+                'coingecko_id': token.coingecko_id,
                 'platform': token.platform,
                 'address':  token.address,
                 'decimals': token.decimals,
