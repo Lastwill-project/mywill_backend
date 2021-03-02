@@ -252,7 +252,7 @@ def check_promocode(promo_str, user, cost, contract, details):
     if contract.contract_type == 5:
         if details.authio:
             options_price += 450 * NET_DECIMALS['USDT']
-    if contract.contract_type in (5, 4, 8, 27, 28):
+    if contract.contract_type in (5, 4, 8, 27, 28, 29):
         if details.verification:
             options_price += VERIFICATION_PRICE_USDT * NET_DECIMALS['USDT']
 
@@ -1476,7 +1476,7 @@ def buy_verification(request):
     if contract.user != request.user or contract.state not in ('ACTIVE', 'DONE', 'ENDED'):
         raise PermissionDenied
 
-    if contract.contract_type not in (4, 5, 8, 27, 28):
+    if contract.contract_type not in (4, 5, 8, 27, 28, 29):
         raise PermissionDenied
     '''
     if contract.network.name != 'ETHEREUM_MAINNET':
@@ -1525,7 +1525,7 @@ def buy_verification(request):
         mail.attach('token.sol', details.eth_contract_token.source_code)
         mail.attach('ico.sol', details.eth_contract_crowdsale.source_code)
         mail.send()
-    elif contract.contract_type == 8:
+    elif contract.contract_type in (8, 29):
         mail = EmailMessage(
             subject=verification_subject,
             body=verification_message.format(
