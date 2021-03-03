@@ -1,6 +1,6 @@
 from lastwill.contracts.submodels.airdrop import AbstractContractDetailsAirdrop
 from lastwill.contracts.submodels.common import *
-from lastwill.consts import NET_DECIMALS, CONTRACT_PRICE_USDT
+from lastwill.consts import NET_DECIMALS, CONTRACT_PRICE_USDT, VERIFICATION_PRICE_USDT
 from lastwill.settings import BSC_WEB3_ATTEMPTS
 
 
