@@ -42,15 +42,17 @@ class CoinGeckoToken(models.Model):
     Поля:
     - title : str, 255 симв;
     - short_title : str, 64 симв., необязательное;
+    - coingecko_id : str, 255 симв., необязательное;
     - address : str, 50 симв., обязательное;
     - platform : str, 255 симв, необязательное;
     - decimals : decimal, макс. 255;
     - image_file : url, 200 симв., необязательное;
     - token_rank : int;
-    - token_usd_price : decimal, макс. 255, макс. чисел после запятой 15;
+    - token_usd_price : decimal, макс. 255, макс. чисел после запятой 7;
     - created_at : date-time, автодобавляемое;
     - updated_at : date-time, автообновляемое;
     - is_native : bool, по-умолчанию False;
+    - is_upgradable : bool, по-умолчанию True;
     - is_displayed : bool, по-умолчанию True;
     """
     title = models.CharField(max_length=255)
@@ -74,20 +76,21 @@ class CoinGeckoToken(models.Model):
     )
     image_file = models.ImageField(
         upload_to=f'token_images/',
-        default='token_images/fa-empire.png',
+        default='token_images/default_token_ico.png',
         blank=True,
     )
-    rank = models.IntegerField(default=0, blank=True)
+    coingecko_rank = models.IntegerField(default=0, blank=True)
     usd_price = models.DecimalField(
         max_digits=255,
-        decimal_places=15,
+        decimal_places=7,
         default=0,
         blank=True
     )
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now=True)
-    is_native=models.BooleanField(default=False)
-    is_displayed=models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_native = models.BooleanField(default=False)
+    is_upgradable = models.BooleanField(default=True)
+    is_displayed = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'coingecko_tokens'
@@ -100,12 +103,15 @@ class CoinGeckoToken(models.Model):
 
     def save(self, *args, **kwargs):
         self.short_title = self.short_title.lower()
+        self.platform = self.platform.lower()
+        self.address = self.address.lower()
 
-        if self.platform and not self.address:
+        if self.title == 'Ethereum' and self.short_title == 'eth':
+            self.platform = 'ethereum'
             self.address = ETH_ADDRESS
 
         if self.title == 'Rubic' and self.short_title == 'rbc':
-            self.rank = -1
+            self.coingecko_rank = -1
 
         return super().save(*args, **kwargs)
 

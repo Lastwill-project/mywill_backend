@@ -14,6 +14,8 @@
     - Подгружаются иконки к каждому НЕ скрытому токену. По-умолчанию в качестве иконки токену устанавливается fa-empire.png.
 
 """
+from decimal import Decimal, ROUND_HALF_UP
+import logging
 from requests import get
 from time import sleep
 
@@ -83,7 +85,8 @@ def get_coingecko_token_id(tokens, exclude_token=['thorecoin', ]):
 
     if exclude_token:
         for token in exclude_token:
-            coingecko_id_list.pop(coingecko_id_list.index(token))
+            if token in coingecko_id_list:
+                coingecko_id_list.pop(coingecko_id_list.index(token))
 
     return coingecko_id_list
 
@@ -210,7 +213,7 @@ def format_marketdata():
     #         "symbol":"1337",
     #         "name":"1337",
     #         "platforms":{
-    #             "ethereum":"0x35872fea6a4843facbcdbce99e3b69596a3680b8"
+    #             "ethereum": "0x35872fea6a4843facbcdbce99e3b69596a3680b8"
     #         }
     #     }
     # ]
@@ -222,27 +225,25 @@ def format_marketdata():
         for _, token in enumerate(actual_tokens):
             for _, item in enumerate(actual_token_market_data):
                 if token.get('id') == item.get('id'):
-                    token_title = token.get('name', '')
-                    token_short_title = token.get('symbol', '').lower()
-                    platform = ''.join(token.get('platforms', '').keys())
-                    address = ''
+                    token_title = token.get('name')
+                    token_short_title = token.get('symbol').lower()
+                    platforms = list(token.get('platforms').keys())
                     coingecko_id = token.get('id').lower()
-                    token_image_link = item.get('image', '')
-                    token_rank = item.get('market_cap_rank', 0)
-                    token_usd_price = item.get('current_price', 0)
-
-                    if platform:
-                        address = token.get('platforms').get(platform, '')
+                    token_image_link = item.get('image')
+                    token_rank = item.get('market_cap_rank')
+                    token_usd_price = item.get('current_price')
 
                     token_data = {
-                        'token_title': token_title,
-                        'token_short_title': token_short_title,
-                        'token_platform': platform,
-                        'token_address': address if address else '',
-                        'token_coingecko_id': coingecko_id,
-                        'token_image_link': token_image_link,
-                        'token_rank': token_rank if token_rank else 0,
-                        'token_usd_price': token_usd_price if token_usd_price else 0,
+                        'token_title': str(token_title),
+                        'token_short_title': str(token_short_title),
+                        'token_platform': str(platforms[0]) if platforms else '',
+                        'token_address': str(token.get('platforms').get(platforms[0])) if platforms else '',
+                        'token_coingecko_id': str(coingecko_id),
+                        'token_image_link': str(token_image_link),
+                        'token_rank': int(token_rank) if token_rank else 0,
+                        'token_usd_price': Decimal(token_usd_price).quantize(
+                            Decimal('1.0000000'), ROUND_HALF_UP
+                        ) if token_usd_price else 0,
                     }
                     result.update(
                         {
@@ -338,11 +339,10 @@ def refresh_token_visibility(actual_coingecko_token_list: list):
     # в БД. Нужно собрать записи, которые не попали по фильру и одним запросом
     # обновить им поле is_displayed на False.
     for _, token in enumerate(current_tokens):
-        if not (
+        if (
             token.title,
             token.short_title
-        ) in actual_coingecko_token_list:
-            # token.update(is_displayed=False)
+        ) not in actual_coingecko_token_list:
             current_tokens.filter(
                 title=token.title,
                 short_title=token.short_title
@@ -364,7 +364,7 @@ def sync_data():
 
     actual_cg_tokens = get_current_coingecko_tokens()
 
-    print(
+    logging.info(
         f'Total coingecko tokens has been founded: {len(data_for_sync)}.'
     )
 
@@ -373,7 +373,6 @@ def sync_data():
     # перечнем (6К+ записей на 4.12.2020).
     try:
         for _, actual_token in enumerate(actual_tokens):
-            counter += 1
             token_title = actual_token[0]
             token_short_title = actual_token[1]
             token = data_for_sync.get(token_short_title)
@@ -383,6 +382,10 @@ def sync_data():
                     title=token_title,
                     short_title=token_short_title
                 )
+
+                if not cg_token.is_upgradable:
+                    continue
+
                 # cg_token.platform = token.get('token_platform')
                 # cg_token.address = token.get('token_address')
                 cg_token.coingecko_id = token.get('token_coingecko_id')
@@ -392,7 +395,9 @@ def sync_data():
 
                 cg_token.save()
 
-                print(
+                counter += 1
+
+                logging.info(
                     '{}. Token "{} ({})" has been updated successfully.'.format(
                         counter,
                         token.get('token_title'),
@@ -407,11 +412,13 @@ def sync_data():
                     address=token.get('token_address'),
                     coingecko_id=token.get('token_coingecko_id'),
                     source_image_link=token.get('token_image_link'),
-                    rank=token.get('token_rank'),
+                    coingecko_rank=token.get('token_rank'),
                     usd_price=token.get('token_usd_price'),
                 )
 
-                print(
+                counter += 1
+
+                logging.info(
                     '{}. Token "{} ({})" has been added successfully.'.format(
                         counter,
                         token.get('token_title'),
@@ -424,7 +431,7 @@ def sync_data():
         )
         return 0
 
-    print(
+    logging.info(
         'Total tokens has been refreshed: {}.\nToken market data has been synced at {}.'.format(
             counter,
             get_current_coingecko_tokens().last().updated_at
@@ -457,7 +464,7 @@ def add_icon_to_token(
                 content=ContentFile(get(icon_url).content)
             )
 
-        print(
+        logging.info(
             f'{counter}. Token "{token.short_title}" icon has been added successfully.'
         )
 

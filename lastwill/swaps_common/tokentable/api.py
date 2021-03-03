@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 
 from django.core.files.base import ContentFile
@@ -203,8 +204,18 @@ def get_coingecko_tokens(request):
 
     ---
 
-    Принимаемые параметры:
-    - request
+    Возвращаемое значение:
+    {
+        'token_title': string,
+        'token_short_title': string.upper,
+        'coingecko_id': str,
+        'platform': string.lower,
+        'address':  string.lower,
+        'decimals': integer,
+        'image_link': string,
+        'coingecko_rank': integer,
+        'usd_price': decimal,
+    }
     """
     coingecko_tokens = get_actual_coingecko_tokens(request)
 
@@ -275,7 +286,7 @@ def get_actual_coingecko_tokens(request):
                     serve_url,
                     token.image_file.url
                 ),
-                'coingecko_rank': token.rank,
+                'coingecko_rank': token.coingecko_rank,
                 'usd_price': token.usd_price,
             })
 
