@@ -1,7 +1,9 @@
 from django.db import models
-
+import datetime
 from lastwill.contracts.submodels.common import *
 from lastwill.consts import NET_DECIMALS, CONTRACT_GAS_LIMIT, CONTRACT_PRICE_USDT, VERIFICATION_PRICE_USDT
+from lastwill.settings import SUPPORT_EMAIL
+from django.core.mail import EmailMessage
 
 
 class AirdropAddress(models.Model):
