@@ -11,11 +11,11 @@ def update_rates():
         time.sleep(5)
 
 
-def convert(amount, from_cur, to_cur):
+def convert(amount, fsym, tsym):
     try:
-        rate = Rate.objects.get(from_cur=from_cur, to_cur=to_cur)
+        rate = Rate.objects.get(fsym=fsym, tsym=tsym)
     except Rate.DoesNotExist:
-        rate = Rate(from_cur=from_cur, to_cur=to_cur)
+        rate = Rate(fsym=fsym, tsym=tsym)
         rate.update()
         rate.save()
 
