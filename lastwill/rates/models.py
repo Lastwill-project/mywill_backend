@@ -33,15 +33,16 @@ class Rate(models.Model):
             self.save()
             return
 
+        tsym = COINGECKO_SYMBOL[self.tsym]
+
         if self.fsym == 'USD':
             try:
-                self.value = 1 / self._get_rate(self.tsym, 'usd')
+                self.value = 1 / self._get_rate(tsym, 'usd')
                 self.save()
                 return
             except KeyError:
                 raise RateException
 
-        tsym = COINGECKO_SYMBOL[self.tsym]
         fsym = COINGECKO_SYMBOL[self.fsym]
 
         try:
