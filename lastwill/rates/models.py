@@ -1,7 +1,7 @@
 import requests
 from django.db import models
 
-COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids={fsym}&vs_currencies={tsynm}'
+COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids={fsym}&vs_currencies={tsym}'
 
 COINGECKO_SYMBOL = {
     'ETH': 'ethereum',
