@@ -36,7 +36,7 @@ class Rate(models.Model):
         tsym = COINGECKO_SYMBOL[self.fsym]
 
         try:
-            self.rate = self._get_rate(fsym, self.tsym.lower())
+            self.value = self._get_rate(fsym, self.tsym.lower())
             self.save()
         except KeyError:
             fsym_usd_rate = self._get_rate(fsym, 'usd')
