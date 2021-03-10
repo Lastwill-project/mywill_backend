@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'lastwill.swaps_common',
     'lastwill.swaps_common.tokentable',
     'lastwill.panama_bridge',
+    'lastwill.rates',
 ]
 
 MIDDLEWARE = [
@@ -303,4 +304,8 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'lastwill.swaps_common.tasks.order_limiter',
         'schedule': crontab(minute='*'),
     },
+    'update_rates': {
+        'task': 'lastwill.rates.api.update_rates',
+        'schedule': crontab(minute='*/10'),
+    }
 }
