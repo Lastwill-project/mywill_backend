@@ -28,7 +28,7 @@ def rate(fsym, tsym):
         rate_obj.update()
         try:
             rate_obj.save()
-        except IntegrityError:
+        except Exception:
             rate_obj = Rate.objects.get(fsym=fsym, tsym=tsym)
 
     return rate_obj.value
