@@ -12,6 +12,8 @@ COINGECKO_SYMBOL = {
     'EOS': 'eos',
     'TRX': 'tron',
     'BNB': 'binancecoin',
+    'USDT': 'tether',
+    'EOSISH': 'eosish',
 }
 
 
