@@ -11,6 +11,7 @@ COINGECKO_SYMBOL = {
     'RBC': 'rubic',
     'EOS': 'eos',
     'TRX': 'tron',
+    'BNB': 'binancecoin',
 }
 
 
