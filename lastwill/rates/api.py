@@ -11,13 +11,16 @@ from lastwill.rates.models import Rate
 def update_rates():
     rates = Rate.objects.all()
     for rate in rates:
+        old_value = rate.value
         try:
             rate.update()
+            rate.save()
+            print(f'{rate.fsym} -> {rate.tsym} rate updated: {rate.value} (bias={abs(rate.value - old_value)})',
+                  flush=True)
         except Exception:
             print('\n'.join(traceback.format_exception(*sys.exc_info())), flush=True)
 
-        print(f'{rate.fsym} -> {rate.tsym} rate updated: {rate.value}', flush=True)
-        time.sleep(1)
+        time.sleep(5)
 
 
 def rate(fsym, tsym):
