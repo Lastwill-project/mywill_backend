@@ -1,4 +1,6 @@
 import time
+import traceback
+import sys
 from celery import shared_task
 from lastwill.rates.models import Rate
 
@@ -7,7 +9,11 @@ from lastwill.rates.models import Rate
 def update_rates():
     rates = Rate.objects.all()
     for rate in rates:
-        rate.update()
+        try:
+            rate.update()
+        except Exception:
+            print('\n'.join(traceback.format_exception(*sys.exc_info())), flush=True)
+
         print(f'{rate.fsym} -> {rate.tsym} rate updated: {rate.value}', flush=True)
         time.sleep(1)
 
