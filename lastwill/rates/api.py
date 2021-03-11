@@ -1,9 +1,9 @@
 import time
-from lastwill.celery import app
+from celery import shared_task
 from lastwill.rates.models import Rate
 
 
-@app.task()
+@shared_task
 def update_rates():
     rates = Rate.objects.all()
     for rate in rates:
