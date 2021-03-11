@@ -71,4 +71,3 @@ class Rate(models.Model):
         temp_value = self._get_rate(fsym, tsym)
 
         self.value = self._result_value(temp_value)
-        self.save()
