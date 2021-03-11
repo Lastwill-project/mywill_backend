@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from lastwill.parint import *
-from exchange_API import convert
 from lastwill.rates.api import rate
 
 
@@ -34,7 +33,7 @@ def login(request):
 
 @api_view()
 def eth2rub(request):
-    return Response(convert('ETH', 'RUB'))
+    return Response({'RUB': rate('ETH', 'RUB')})
 
 @api_view()
 def exc_rate(request):

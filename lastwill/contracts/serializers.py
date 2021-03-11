@@ -37,11 +37,11 @@ from lastwill.contracts.models import (
 )
 from lastwill.contracts.models import send_in_queue
 from lastwill.contracts.decorators import *
+from lastwill.rates.api import rate
 from lastwill.settings import EMAIL_HOST_USER_SWAPS, EMAIL_HOST_PASSWORD_SWAPS
 from lastwill.consts import NET_DECIMALS
 from lastwill.profile.models import *
 from lastwill.payments.api import create_payment
-from exchange_API import convert, bnb_to_wish
 from lastwill.consts import MAIL_NETWORK
 import email_messages
 from neocore.Cryptography.Crypto import Crypto
@@ -231,11 +231,11 @@ class ContractSerializer(serializers.ModelSerializer):
         usdt_cost = int(usdt_cost)
         res['cost'] = {
             'USDT': str(usdt_cost),
-            'ETH': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'ETH')['ETH'] * 10 ** 18)),
-            'WISH': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'WISH')['WISH'] * 10 ** 18)),
-            'BTC': str(int(round((int(usdt_cost) / 10 ** 6 * convert('USDT', 'BTC')['BTC'] * 10 ** 8), 0))),
-            'EOS': str(int(int(usdt_cost) / 10 ** 6 * convert('USDT', 'EOS')['EOS'] * 10 ** 4)),
-            'TRON': str(int(round((int(usdt_cost) * convert('USDT', 'TRX')['TRX']), 0))),
+            'ETH': str(int(int(usdt_cost) / 10 ** 6 * rate('USDT', 'ETH') * 10 ** 18)),
+            'WISH': str(int(int(usdt_cost) / 10 ** 6 * rate('USDT', 'WISH') * 10 ** 18)),
+            'BTC': str(int(round((int(usdt_cost) / 10 ** 6 * rate('USDT', 'BTC') * 10 ** 8), 0))),
+            'EOS': str(int(int(usdt_cost) / 10 ** 6 * rate('USDT', 'EOS') * 10 ** 4)),
+            'TRON': str(int(round((int(usdt_cost) * rate('USDT', 'TRX')), 0))),
         }
         if contract.network.name == 'EOS_MAINNET':
             res['cost']['EOS'] = str(Contract.get_details_model(
@@ -243,7 +243,7 @@ class ContractSerializer(serializers.ModelSerializer):
             ).calc_cost_eos(res['contract_details'], contract.network))
             res['cost']['EOSISH'] = str(float(
                 res['cost']['EOS']
-            ) * convert('EOS', 'EOSISH')['EOSISH'])
+            ) * rate('EOS', 'EOSISH'))
         if contract.network.name == 'EOS_TESTNET':
             res['cost']['EOS'] = 0
             res['cost']['EOSISH'] = 0
@@ -261,12 +261,12 @@ class ContractSerializer(serializers.ModelSerializer):
             ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
             res['cost'] = {
                 'USDT': str(int(cost * NET_DECIMALS['USDT'])),
-                'ETH': str(int(cost) * convert('USDT', 'ETH')['ETH'] * NET_DECIMALS['ETH']),
-                'WISH': str(int(cost) * convert('USDT', 'WISH')['WISH'] * NET_DECIMALS['WISH']),
-                'BTC': str(int(cost) * convert('USDT', 'BTC')['BTC'] * NET_DECIMALS['BTC']),
-                'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
-                'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP']),
-                'OKB': str(int(cost) * convert('USDT', 'OKB')['OKB'] * NET_DECIMALS['OKB'])
+                'ETH': str(int(cost) * rate('USDT', 'ETH') * NET_DECIMALS['ETH']),
+                'WISH': str(int(cost) * rate('USDT', 'WISH') * NET_DECIMALS['WISH']),
+                'BTC': str(int(cost) * rate('USDT', 'BTC') * NET_DECIMALS['BTC']),
+                'BNB': str(int(cost) * rate('USDT', 'BNB') * NET_DECIMALS['BNB']),
+                'SWAP': str(int(cost) * rate('USDT', 'SWAP') * NET_DECIMALS['SWAP']),
+                'OKB': str(int(cost) * rate('USDT', 'OKB') * NET_DECIMALS['OKB'])
             }
         elif contract.contract_type == 23:
             cost = Contract.get_details_model(
@@ -274,12 +274,12 @@ class ContractSerializer(serializers.ModelSerializer):
             ).calc_cost_usdt(res['contract_details'], contract.network) / NET_DECIMALS['USDT']
             res['cost'] = {
                 'USDT': str(int(cost * NET_DECIMALS['USDT'])),
-                'ETH': str(int(cost) * convert('USDT', 'ETH')['ETH'] * NET_DECIMALS['ETH']),
-                'WISH': str(int(cost) * convert('USDT', 'BNB')['BNB'] * bnb_to_wish() * NET_DECIMALS['WISH']),
-                'BTC': str(int(cost) * convert('USDT', 'BTC')['BTC'] * NET_DECIMALS['BTC']),
-                'BNB': str(int(cost) * convert('USDT', 'BNB')['BNB'] * NET_DECIMALS['BNB']),
-                'SWAP': str(int(cost) * convert('USDT', 'SWAP')['SWAP'] * NET_DECIMALS['SWAP']),
-                'OKB': str(int(cost) * convert('USDT', 'OKB')['OKB'] * NET_DECIMALS['OKB'])
+                'ETH': str(int(cost) * rate('USDT', 'ETH') * NET_DECIMALS['ETH']),
+                'WISH': str(int(cost) * rate('USDT', 'WISH') * NET_DECIMALS['WISH']),
+                'BTC': str(int(cost) * rate('USDT', 'BTC') * NET_DECIMALS['BTC']),
+                'BNB': str(int(cost) * rate('USDT', 'BNB') * NET_DECIMALS['BNB']),
+                'SWAP': str(int(cost) * rate('USDT', 'SWAP') * NET_DECIMALS['SWAP']),
+                'OKB': str(int(cost) * rate('USDT', 'OKB') * NET_DECIMALS['OKB'])
             }
 
         return res

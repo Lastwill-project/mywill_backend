@@ -28,7 +28,6 @@ from lastwill.settings import NETWORKS
 from lastwill.deploy.models import DeployAddress
 from lastwill.payments.api import create_payment
 from lastwill.profile.models import Profile
-from exchange_API import to_wish
 
 
 class Receiver(threading.Thread):

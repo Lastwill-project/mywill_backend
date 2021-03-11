@@ -23,7 +23,6 @@ from lastwill.contracts.models import Contract, WhitelistAddress, AirdropAddress
     ContractDetailsBinanceInvestmentPool
 from lastwill.deploy.models import Network
 from lastwill.payments.api import create_payment
-from exchange_API import to_wish, convert
 from email_messages import authio_message, authio_subject, authio_google_subject, authio_google_message
 from .serializers import ContractSerializer, count_sold_tokens, WhitelistAddressSerializer, AirdropAddressSerializer, \
     EOSAirdropAddressSerializer, deploy_swaps, deploy_protector, ContractDetailsTokenSerializer
@@ -37,7 +36,7 @@ BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/
 
 
 def check_and_apply_promocode(promo_str, user, cost, contract_type, cid):
-    wish_cost = to_wish('ETH', int(cost))
+    wish_cost = int(cost) * rate('ETH', 'WISH')
     if promo_str:
         try:
             discount = check_and_get_discount(

@@ -676,7 +676,6 @@ class ContractDetailsTRONLostkey(CommonDetails):
                 + triggerEnergyPerToken * energyPrice * tokensCount
         )
         tron_cost = (constructPrice + checkPrice + triggerPrice) * 200 / 10 ** 6
-        # result = (int(tron_cost) * convert('TRX', 'ETH')['ETH'] * 10 ** 18)
         result = int(CONTRACT_PRICE_USDT['TRON_LOSTKEY'] * NET_DECIMALS['USDT'])
         return result
 

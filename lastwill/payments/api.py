@@ -9,7 +9,7 @@ from lastwill.payments.models import InternalPayment, FreezeBalance
 from lastwill.profile.models import Profile, UserSiteBalance, SubSite
 from lastwill.settings import MY_WISH_URL, TRON_URL, SWAPS_URL, TOKEN_PROTECTOR_URL, NETWORKS, RUBIC_EXC_URL, RUBIC_FIN_URL
 from lastwill.consts import NET_DECIMALS
-from exchange_API import to_wish, convert
+from lastwill.rates.api import rate
 
 
 def create_payment(uid, tx, currency, amount, site_id, network=None):
@@ -26,9 +26,7 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
             else:
                 amount *= 1.1
 
-        value = amount if (currency in ['WISH', 'BWISH', 'BSCWISH', 'WWISH']) else to_wish(
-            currency, amount
-        )
+        value = amount if (currency in ['WISH', 'BWISH', 'BSCWISH', 'WWISH']) else amount * rate(currency, 'WISH')
         if currency == 'BTC':
             value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['BTC']
         if currency in ['TRON', 'TRX', 'TRONISH']:
@@ -37,22 +35,18 @@ def create_payment(uid, tx, currency, amount, site_id, network=None):
             value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['EOS']
         if currency == 'USDT':
             value = value * NET_DECIMALS['ETH'] / NET_DECIMALS['USDT']
-    # elif SubSite.objects.get(id=site_id).site_name == TRON_URL:
-    #     value = amount if currency in ('TRONISH', 'TRX') else amount * float(convert(
-    #         currency, 'TRX'
-    #     )['TRX']) / NET_DECIMALS[currency] * NET_DECIMALS['TRON']
     elif SubSite.objects.get(id=site_id).site_name in [SWAPS_URL, RUBIC_EXC_URL, RUBIC_FIN_URL]:
-        value = amount if currency == 'USDT' else amount * float(convert(
+        value = amount if currency == 'USDT' else amount * float(rate(
             currency, 'USDT'
-        )['USDT']) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
+        )) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
 
     elif SubSite.objects.get(id=site_id).site_name == TOKEN_PROTECTOR_URL:
-        value = amount if currency == 'USDT' else amount * float(convert(
+        value = amount if currency == 'USDT' else amount * float(rate(
             currency, 'USDT'
-        )['USDT']) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
+        )) / NET_DECIMALS[currency] * NET_DECIMALS['USDT']
     else:
         amount = calculate_decimals(currency, amount)
-        value = amount if currency == 'EOSISH' else amount * convert(currency, 'EOSISH')['EOSISH'] * NET_DECIMALS['EOSISH']
+        value = amount if currency == 'EOSISH' else amount * rate(currency, 'EOSISH') * NET_DECIMALS['EOSISH']
         amount = add_decimals(currency, amount)
     user = User.objects.get(id=uid)
     if amount < 0.0:
@@ -108,7 +102,7 @@ def freeze_payments(amount, network):
     if network == 'EOS_MAINNET':
     #if currency in ('EOS', 'EOSISH'):
         value = amount * 0.15 * NET_DECIMALS['EOSISH'] / NET_DECIMALS['ETH']
-        value *= convert('WISH', 'EOSISH')['EOSISH']
+        value *= rate('WISH', 'EOSISH')
         #value = float(':.4f'.format(value)
         FreezeBalance.objects.select_for_update().filter(id=1).update(
             eosish=F('eosish') + value
@@ -117,7 +111,7 @@ def freeze_payments(amount, network):
     elif network == 'TRON_MAINNET':
     #elif currency in ('TRON', 'TRONISH'):
         value = amount * 0.10 * NET_DECIMALS['TRX'] / NET_DECIMALS['ETH']
-        value *= convert('WISH', 'TRONISH')['TRONISH']
+        value *= rate('WISH', 'TRONISH')
         FreezeBalance.objects.select_for_update().filter(id=1).update(
             tronish=F('tronish') + int(value)
         )

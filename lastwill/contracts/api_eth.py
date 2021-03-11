@@ -237,8 +237,8 @@ def calculate_cost_eth_token_contract(request):
     log_userinfo('calculate_cost_eos_account', token)
     return Response({
         'ETH': str(int(eth_cost)),
-        'WISH': str(int(eth_cost) * convert('ETH', 'WISH')['WISH']),
-        'BTC': str(int(eth_cost) * convert('ETH', 'BTC')['BTC'])
+        'WISH': str(int(eth_cost) * rate('ETH', 'WISH')),
+        'BTC': str(int(eth_cost) * rate('ETH', 'BTC'))
     })
 
 
@@ -291,7 +291,7 @@ def deploy_eth_token(request):
     contract_details.predeploy_validate()
     if contract.network.id == 1:
         eth_cost = int(CONTRACT_PRICE_ETH['TOKEN'] * NET_DECIMALS['ETH'])
-        wish_cost = int(eth_cost) * convert('ETH', 'WISH')['WISH']
+        wish_cost = int(eth_cost) * rate('ETH', 'WISH')
         if 'promo' in request.data:
             promo = request.data['promo'].upper()
             user_balance = UserSiteBalance.objects.get(user=user, subsite__site_name=MY_WISH_URL).balance

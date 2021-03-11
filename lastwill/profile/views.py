@@ -30,9 +30,8 @@ from allauth.account.utils import (
     url_str_to_user_pk,
 )
 from allauth.account.models import EmailAddress, EmailConfirmation, EmailConfirmationHMAC
+from lastwill.rates.api import rate
 from tron_wif.hex2wif import hex2tronwif
-
-from exchange_API import to_wish, convert
 from lastwill.contracts.models import Contract
 from lastwill.profile.helpers import valid_totp
 from lastwill.settings import BINANCE_PAYMENT_ADDRESS, MY_WISH_URL, SUPPORT_EMAIL, DEFAULT_FROM_EMAIL, WAVES_URL, \
@@ -200,7 +199,7 @@ def profile_view(request):
             'eos_address': 'mywishcoming',
             'bnb_address': BINANCE_PAYMENT_ADDRESS,
             'tron_address': hex2tronwif(user_balance.tron_address) if user_balance.tron_address else '',
-            'usdt_balance': str(int(int(user_balance.balance) / 10 ** 18 * convert('WISH', 'USDT')['USDT'] * 10 ** 6)),
+            'usdt_balance': str(int(int(user_balance.balance) / 10 ** 18 * rate('WISH', 'USDT') * 10 ** 6)),
             'is_swaps_admin': request.user.profile.is_swaps_admin,
             'swaps_notifications': swaps_notifications
     }

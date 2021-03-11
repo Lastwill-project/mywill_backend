@@ -16,7 +16,7 @@ from lastwill.promo.models import *
 from lastwill.settings import EOSISH_URL
 from lastwill.deploy.models import *
 from lastwill.consts import *
-from exchange_API import *
+from lastwill.rates.api import rate
 
 
 def check_account_name(name, network_id):
@@ -275,7 +275,7 @@ def deploy_eos_account(request):
             'buy_ram_kbytes': contract_details.buy_ram_kbytes
         }
         eosish_cost = contract_details.calc_cost_eos(params, network)
-        eos_cost = (int(eosish_cost) * convert('EOS', 'EOSISH')['EOSISH'])
+        eos_cost = (int(eosish_cost) * rate('EOS', 'EOSISH'))
         if 'promo' in request.data:
             promo = request.data['promo'].upper()
             user_balance = UserSiteBalance.objects.get(user=user, subsite__site_name=EOSISH_URL).balance
@@ -422,10 +422,10 @@ def calculate_cost_eos_account(request):
 
     return JsonResponse({
         'EOS': str(eos_cost),
-        'EOSISH': str(int(eos_cost) * convert('EOS', 'EOSISH')['EOSISH']),
-        'ETH': str(round(int(eos_cost) * convert('EOS', 'ETH')['ETH'], 2)),
-        'WISH': str(int(eos_cost) * convert('EOS', 'WISH')['WISH']),
-        'BTC': str(int(eos_cost) * convert('EOS', 'BTC')['BTC'])
+        'EOSISH': str(eos_cost * rate('EOS', 'EOSISH')),
+        'ETH': str(eos_cost * rate('EOS', 'ETH')),
+        'WISH': str(eos_cost * rate('EOS', 'WISH')),
+        'BTC': str(eos_cost * rate('EOS', 'BTC')),
     })
 
 
@@ -465,10 +465,10 @@ def calculate_cost_eos_account_contract(request):
 
     return JsonResponse({
         'EOS': str(eos_cost),
-        'EOSISH': str(int(eos_cost) * convert('EOS', 'EOSISH')['EOSISH']),
-        'ETH': str(round(int(eos_cost) * convert('EOS', 'ETH')['ETH'], 2)),
-        'WISH': str(int(eos_cost) * convert('EOS', 'WISH')['WISH']),
-        'BTC': str(int(eos_cost) * convert('EOS', 'BTC')['BTC'])
+        'EOSISH': str(eos_cost * rate('EOS', 'EOSISH')),
+        'ETH': str(eos_cost * rate('EOS', 'ETH')),
+        'WISH': str(eos_cost * rate('EOS', 'WISH')),
+        'BTC': str(eos_cost * rate('EOS', 'BTC')),
     })
 
 
