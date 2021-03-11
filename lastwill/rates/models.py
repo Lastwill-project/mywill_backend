@@ -62,12 +62,10 @@ class Rate(models.Model):
             return value
 
     def update(self):
-        fsym = TEMP_CURRENCY[self.fsym] or self.fsym
-        tsym = TEMP_CURRENCY[self.tsym] or self.tsym
+        fsym = self.fsym if self.fsym not in TEMP_CURRENCY else TEMP_CURRENCY[self.fsym]
+        tsym = self.tsym if self.tsym not in TEMP_CURRENCY else TEMP_CURRENCY[self.tsym]
 
         temp_value = self._get_rate(fsym, tsym)
 
         self.value = self._result_value(temp_value)
         self.save()
-
-
