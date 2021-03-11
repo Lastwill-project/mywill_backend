@@ -31,6 +31,7 @@ from lastwill.consts import *
 import requests
 from lastwill.contracts.submodels.token_protector import ContractDetailsTokenProtector
 from django.db.models import Q
+from lastwill.rates.api import rate
 
 BROWSER_HEADERS = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:69.0) Geko/20100101 Firefox/69.0'}
 
@@ -807,7 +808,7 @@ def get_cost_all_contracts(request):
             'USDT': str(contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDT']),
             'WISH': str(int(
                 contract_details_types[i]['model'].min_cost() / NET_DECIMALS['USDT']
-            ) * convert('USDT', 'WISH')['WISH'])
+            ) * rate('USD', 'WISH'))
         }
     return JsonResponse(answer)
 
