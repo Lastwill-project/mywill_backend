@@ -8,6 +8,7 @@ def update_rates():
     rates = Rate.objects.all()
     for rate in rates:
         rate.update()
+        print(f'{rate.fsym} -> {rate.tsym} rate updated: {rate.value}', flush=True)
         time.sleep(5)
 
 
