@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from lastwill.parint import *
 from exchange_API import convert
+from lastwill.rates.api import rate
 
 
 def index(request):
@@ -37,7 +38,9 @@ def eth2rub(request):
 
 @api_view()
 def exc_rate(request):
-    return Response(convert(request.query_params.get('fsym'), request.query_params.get('tsyms')))
+    fsym = request.query_params['fsym']
+    tsym = request.query_params['tsyms']
+    return Response({fsym: rate(fsym, tsym)})
 
 
 def redirect_contribute(request):
