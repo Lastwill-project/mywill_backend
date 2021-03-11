@@ -2,6 +2,8 @@ import time
 import traceback
 import sys
 from celery import shared_task
+from django.db import IntegrityError
+
 from lastwill.rates.models import Rate
 
 
@@ -24,6 +26,9 @@ def rate(fsym, tsym):
     except Rate.DoesNotExist:
         rate_obj = Rate(fsym=fsym, tsym=tsym)
         rate_obj.update()
-        rate_obj.save()
+        try:
+            rate_obj.save()
+        except IntegrityError:
+            rate_obj = Rate.objects.get(fsym=fsym, tsym=tsym)
 
     return rate_obj.value
