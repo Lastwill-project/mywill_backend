@@ -15,6 +15,7 @@ COINGECKO_SYMBOL = {
     'USDT': 'tether',
     'EOSISH': 'eosish',
     'NEO': 'neo',
+    'SWAP': 'swaps-network',
 }
 
 TEMP_CURRENCY = {
