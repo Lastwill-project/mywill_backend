@@ -9,7 +9,7 @@ def update_rates():
     for rate in rates:
         rate.update()
         print(f'{rate.fsym} -> {rate.tsym} rate updated: {rate.value}', flush=True)
-        time.sleep(5)
+        time.sleep(1)
 
 
 def rate(fsym, tsym):
