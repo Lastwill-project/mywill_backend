@@ -7,6 +7,10 @@ COINGECKO_SYMBOL = {
     'ETH': 'ethereum',
     'WISH': 'mywish',
     'BTC': 'bitcoin',
+    'OKB': 'okb',
+    'RBC': 'rubic',
+    'EOS': 'eos',
+    'TRX': 'tron',
 }
 
 
