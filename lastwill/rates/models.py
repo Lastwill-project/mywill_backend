@@ -16,6 +16,10 @@ COINGECKO_SYMBOL = {
     'EOSISH': 'eosish',
 }
 
+TEMP_CURRENCY = {
+    'TRONISH': 'TRX'
+}
+
 
 class RateException(Exception):
     pass
@@ -27,36 +31,43 @@ class Rate(models.Model):
     value = models.FloatField()
 
     @staticmethod
-    def _get_rate(fsym, tsym):
+    def _get_coingecko_rate(fsym, tsym):
         response = requests.get(COINGECKO_API_URL.format(fsym=fsym, tsym=tsym))
         if response.status_code != 200:
             raise RateException
 
         return response.json()[fsym][tsym]
 
-    def update(self):
-        if self.fsym == self.tsym:
-            self.value = 1.0
-            self.save()
-            return
-
-        tsym = COINGECKO_SYMBOL[self.tsym]
-
-        if self.fsym == 'USD':
-            try:
-                self.value = 1 / self._get_rate(tsym, 'usd')
-                self.save()
-                return
-            except KeyError:
-                raise RateException
-
-        fsym = COINGECKO_SYMBOL[self.fsym]
+    def _get_rate(self, fsym, tsym):
+        if fsym == tsym:
+            return 1.0
+        if fsym == 'USD':
+            return 1 / self._get_coingecko_rate(COINGECKO_SYMBOL[tsym], 'usd')
 
         try:
-            self.value = self._get_rate(fsym, self.tsym.lower())
-            self.save()
+            value = self._get_coingecko_rate(COINGECKO_SYMBOL[fsym], tsym.lower())
         except KeyError:
-            fsym_usd_rate = self._get_rate(fsym, 'usd')
-            tsym_usd_rate = self._get_rate(tsym, 'usd')
-            self.value = fsym_usd_rate / tsym_usd_rate
-            self.save()
+            fsym_usd_rate = self._get_coingecko_rate(COINGECKO_SYMBOL[fsym], 'usd')
+            tsym_usd_rate = self._get_coingecko_rate(COINGECKO_SYMBOL[tsym], 'usd')
+            value = fsym_usd_rate / tsym_usd_rate
+
+        return value
+
+    def _result_value(self, value):
+        if self.fsym == 'TRONISH':
+            return value * 0.02
+        elif self.tsym == 'TRONISH':
+            return value / 0.02
+        else:
+            return value
+
+    def update(self):
+        fsym = TEMP_CURRENCY[self.fsym] or self.fsym
+        tsym = TEMP_CURRENCY[self.tsym] or self.tsym
+
+        temp_value = self._get_rate(fsym, tsym)
+
+        self.value = self._result_value(temp_value)
+        self.save()
+
+
