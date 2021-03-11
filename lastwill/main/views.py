@@ -40,7 +40,9 @@ def eth2rub(request):
 def exc_rate(request):
     fsym = request.query_params['fsym']
     tsym = request.query_params['tsyms']
-    return Response({fsym: rate(fsym, tsym)})
+    response = {tsym: rate(fsym, tsym)}
+    print('/api/exc_rate/:', response, flush=True)
+    return Response(response)
 
 
 def redirect_contribute(request):
