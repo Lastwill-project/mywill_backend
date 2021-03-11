@@ -30,6 +30,9 @@ class Rate(models.Model):
     tsym = models.CharField(max_length=50)
     value = models.FloatField()
 
+    class Meta:
+        unique_together = (('fsym', 'tsym'),)
+
     @staticmethod
     def _get_coingecko_rate(fsym, tsym):
         response = requests.get(COINGECKO_API_URL.format(fsym=fsym, tsym=tsym))
