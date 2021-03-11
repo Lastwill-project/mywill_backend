@@ -42,7 +42,7 @@ def exc_rate(request):
     response = {}
     for tsym in tsyms:
         response[tsym] = rate(fsym, tsym)
-    print('/api/exc_rate/:', response, flush=True)
+    print(f'{fsym} -> {tsym} rate(s) is', response, flush=True)
     return Response(response)
 
 
