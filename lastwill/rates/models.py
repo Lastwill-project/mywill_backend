@@ -14,6 +14,7 @@ COINGECKO_SYMBOL = {
     'BNB': 'binancecoin',
     'USDT': 'tether',
     'EOSISH': 'eosish',
+    'NEO': 'neo',
 }
 
 TEMP_CURRENCY = {
