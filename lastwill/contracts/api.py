@@ -1039,10 +1039,10 @@ def get_eos_cost(request):
 
     return JsonResponse({
         'EOS': str(eos_cost),
-        'EOSISH': str(int(eos_cost) * convert('EOS', 'EOSISH')['EOSISH']),
-        'ETH': str(round(int(eos_cost) * convert('EOS', 'ETH')['ETH'], 2)),
-        'WISH': str(int(eos_cost) * convert('EOS', 'WISH')['WISH']),
-        'BTC': str(int(eos_cost) * convert('EOS', 'BTC')['BTC'])
+        'EOSISH': str(eos_cost * rate('EOS', 'EOSISH')),
+        'ETH': str(eos_cost * rate('EOS', 'ETH')),
+        'WISH': str(eos_cost * rate('EOS', 'WISH')),
+        'BTC': str(eos_cost * rate('EOS', 'BTC')),
     })
 
 
@@ -1064,10 +1064,10 @@ def get_eos_airdrop_cost(request):
 
     return JsonResponse({
         'EOS': str(eos_cost),
-        'EOSISH': str(int(eos_cost) * convert('EOS', 'EOSISH')['EOSISH']),
-        'ETH': str(round(int(eos_cost) * convert('EOS', 'ETH')['ETH'], 2)),
-        'WISH': str(int(eos_cost) * convert('EOS', 'WISH')['WISH']),
-        'BTC': str(int(eos_cost) * convert('EOS', 'BTC')['BTC'])
+        'EOSISH': str(eos_cost * rate('EOS', 'EOSISH')),
+        'ETH': str(eos_cost * rate('EOS', 'ETH')),
+        'WISH': str(eos_cost * rate('EOS', 'WISH')),
+        'BTC': str(eos_cost * rate('EOS', 'BTC')),
     })
 
 
