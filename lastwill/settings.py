@@ -309,3 +309,24 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='*/10'),
     }
 }
+
+COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids={fsym}&vs_currencies={tsym}'
+
+COINGECKO_SYMBOLS = {
+    'ETH': 'ethereum',
+    'WISH': 'mywish',
+    'BTC': 'bitcoin',
+    'OKB': 'okb',
+    'RBC': 'rubic',
+    'EOS': 'eos',
+    'TRX': 'tron',
+    'BNB': 'binancecoin',
+    'USDT': 'tether',
+    'EOSISH': 'eosish',
+    'NEO': 'neo',
+    'SWAP': 'swaps-network',
+}
+
+TEMP_SYMBOLS = {
+    'TRONISH': 'TRX'
+}

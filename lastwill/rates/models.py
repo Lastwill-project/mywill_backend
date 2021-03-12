@@ -1,26 +1,6 @@
 import requests
 from django.db import models
-
-COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids={fsym}&vs_currencies={tsym}'
-
-COINGECKO_SYMBOL = {
-    'ETH': 'ethereum',
-    'WISH': 'mywish',
-    'BTC': 'bitcoin',
-    'OKB': 'okb',
-    'RBC': 'rubic',
-    'EOS': 'eos',
-    'TRX': 'tron',
-    'BNB': 'binancecoin',
-    'USDT': 'tether',
-    'EOSISH': 'eosish',
-    'NEO': 'neo',
-    'SWAP': 'swaps-network',
-}
-
-TEMP_CURRENCY = {
-    'TRONISH': 'TRX'
-}
+from lastwill.settings import COINGECKO_API_URL, COINGECKO_SYMBOLS, TEMP_SYMBOLS
 
 
 class RateException(Exception):
@@ -39,26 +19,39 @@ class Rate(models.Model):
     def _get_coingecko_rate(fsym, tsym):
         response = requests.get(COINGECKO_API_URL.format(fsym=fsym, tsym=tsym))
         if response.status_code != 200:
-            raise RateException
+            raise RateException('Cannot get rate from coingecko.com')
 
         return response.json()[fsym][tsym]
 
-    def _get_rate(self, fsym, tsym):
+    @staticmethod
+    def _get_coingecko_sym(sym):
+        try:
+            return COINGECKO_SYMBOLS[sym]
+        except KeyError:
+            raise RateException(f'Unknown symbol: {sym}')
+
+    @classmethod
+    def _get_rate(cls, fsym, tsym):
         if fsym == tsym:
             return 1.0
+
+        coingecko_tsym = cls._get_coingecko_sym(tsym)
+
         if fsym == 'USD':
-            return 1 / self._get_coingecko_rate(COINGECKO_SYMBOL[tsym], 'usd')
+            return 1 / cls._get_coingecko_rate(coingecko_tsym, 'usd')
+
+        coingecko_fsym = cls._get_coingecko_sym(fsym)
 
         try:
-            value = self._get_coingecko_rate(COINGECKO_SYMBOL[fsym], tsym.lower())
-        except KeyError:
-            fsym_usd_rate = self._get_coingecko_rate(COINGECKO_SYMBOL[fsym], 'usd')
-            tsym_usd_rate = self._get_coingecko_rate(COINGECKO_SYMBOL[tsym], 'usd')
+            value = cls._get_coingecko_rate(coingecko_fsym, tsym.lower())
+        except KeyError:  # if coingecko returns {} or {tsym: {}}
+            fsym_usd_rate = cls._get_coingecko_rate(coingecko_fsym, 'usd')
+            tsym_usd_rate = cls._get_coingecko_rate(coingecko_tsym, 'usd')
             value = fsym_usd_rate / tsym_usd_rate
 
         return value
 
-    def _result_value(self, value):
+    def _get_result_value(self, value):
         if self.fsym == 'TRONISH':
             return value * 0.02
         elif self.tsym == 'TRONISH':
@@ -67,9 +60,10 @@ class Rate(models.Model):
             return value
 
     def update(self):
-        fsym = self.fsym if self.fsym not in TEMP_CURRENCY else TEMP_CURRENCY[self.fsym]
-        tsym = self.tsym if self.tsym not in TEMP_CURRENCY else TEMP_CURRENCY[self.tsym]
+        # check if we need replace symbol for additional rate logic
+        fsym = self.fsym if self.fsym not in TEMP_SYMBOLS else TEMP_SYMBOLS[self.fsym]
+        tsym = self.tsym if self.tsym not in TEMP_SYMBOLS else TEMP_SYMBOLS[self.tsym]
 
-        temp_value = self._get_rate(fsym, tsym)
+        raw_value = self._get_rate(fsym, tsym)
 
-        self.value = self._result_value(temp_value)
+        self.value = self._get_result_value(raw_value)  # apply additional logic if required
