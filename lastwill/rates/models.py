@@ -11,6 +11,7 @@ class Rate(models.Model):
     fsym = models.CharField(max_length=50)
     tsym = models.CharField(max_length=50)
     value = models.FloatField()
+    last_update_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (('fsym', 'tsym'),)
