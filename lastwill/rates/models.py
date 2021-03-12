@@ -34,21 +34,23 @@ class Rate(models.Model):
     @classmethod
     def _get_rate(cls, fsym, tsym):
         if fsym == tsym:
-            return 1.0
-
-        if fsym == 'USD':
+            value = 1.0
+        elif fsym == 'USD':
             coingecko_tsym = cls._get_coingecko_sym(tsym)
-            return 1 / cls._get_coingecko_rate(coingecko_tsym, 'usd')
-
-        coingecko_fsym = cls._get_coingecko_sym(fsym)
-        coingecko_tsym = cls._get_coingecko_sym(tsym)
-
-        try:
+            value = 1 / cls._get_coingecko_rate(coingecko_tsym, 'usd')
+        elif tsym == 'USD':
+            coingecko_fsym = cls._get_coingecko_sym(fsym)
             value = cls._get_coingecko_rate(coingecko_fsym, tsym.lower())
-        except KeyError:  # if coingecko returns {} or {tsym: {}}
-            fsym_usd_rate = cls._get_coingecko_rate(coingecko_fsym, 'usd')
-            tsym_usd_rate = cls._get_coingecko_rate(coingecko_tsym, 'usd')
-            value = fsym_usd_rate / tsym_usd_rate
+        else:
+            coingecko_fsym = cls._get_coingecko_sym(fsym)
+            coingecko_tsym = cls._get_coingecko_sym(tsym)
+
+            try:
+                value = cls._get_coingecko_rate(coingecko_fsym, tsym.lower())
+            except KeyError:  # if coingecko returns {} or {tsym: {}}
+                fsym_usd_rate = cls._get_coingecko_rate(coingecko_fsym, 'usd')
+                tsym_usd_rate = cls._get_coingecko_rate(coingecko_tsym, 'usd')
+                value = fsym_usd_rate / tsym_usd_rate
 
         return value
 
