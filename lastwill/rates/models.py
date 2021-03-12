@@ -36,12 +36,12 @@ class Rate(models.Model):
         if fsym == tsym:
             return 1.0
 
-        coingecko_tsym = cls._get_coingecko_sym(tsym)
-
         if fsym == 'USD':
+            coingecko_tsym = cls._get_coingecko_sym(tsym)
             return 1 / cls._get_coingecko_rate(coingecko_tsym, 'usd')
 
         coingecko_fsym = cls._get_coingecko_sym(fsym)
+        coingecko_tsym = cls._get_coingecko_sym(tsym)
 
         try:
             value = cls._get_coingecko_rate(coingecko_fsym, tsym.lower())
