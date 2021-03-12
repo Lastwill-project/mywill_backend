@@ -18,7 +18,7 @@ def update_rates():
         except Exception:
             print('\n'.join(traceback.format_exception(*sys.exc_info())), flush=True)
 
-        time.sleep(5)
+        time.sleep(1)
 
 
 def rate(fsym, tsym):
